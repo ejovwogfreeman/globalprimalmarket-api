@@ -4,8 +4,6 @@ const jwt = require("jsonwebtoken");
 const Email = require("../middlewares/email");
 const generateCode = require("../middlewares/generateCode");
 
-const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
-
 const genToken = (user) => {
   return jwt.sign(
     {
@@ -42,7 +40,6 @@ register = async (req, res) => {
       role,
       verificationCode,
       isVerified: false,
-      isGoogleUser: false,
     });
 
     // Email the verification code
@@ -202,11 +199,6 @@ login = async (req, res) => {
         .status(401)
         .json({ message: "Please verify your email before logging in." });
 
-    if (user.isGoogleUser)
-      return res
-        .status(400)
-        .json({ message: "Please login using Google OAuth" });
-
     const ok = await user.comparePassword(password);
     if (!ok) return res.status(401).json({ message: "Invalid credentials" });
 
@@ -248,10 +240,6 @@ login = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
-
-/**
- * @desc Google OAuth register/login
- */
 
 module.exports = {
   register,

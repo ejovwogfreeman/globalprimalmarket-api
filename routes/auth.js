@@ -31,11 +31,6 @@ router.post("/resend-verification", resendVerificationCode);
 router.post("/login", uploadNone, login);
 
 // ------------------------
-// Google OAuth login
-// Body: { tokenId } (from Google Sign-In)
-// router.post("/google", googleAuth);
-
-// ------------------------
 // Get logged-in user info
 // router.get("/me", protect, getMe);
 

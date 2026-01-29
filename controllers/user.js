@@ -1,7 +1,6 @@
 const User = require("../models/user");
 const Notification = require("../models/notification");
 const jwt = require("jsonwebtoken");
-const { OAuth2Client } = require("google-auth-library");
 const Email = require("../middlewares/email");
 const generateCode = require("../middlewares/generateCode");
 const { uploadImages } = require("../middlewares/cloudinary");
@@ -42,13 +41,6 @@ updateProfile = async (req, res) => {
 
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ message: "User not found" });
-
-    // Only allow normal users to update
-    if (user.isGoogleUser) {
-      return res
-        .status(403)
-        .json({ message: "Google users cannot update these fields" });
-    }
 
     // Update allowed fields
     if (name) user.name = name;
@@ -95,13 +87,6 @@ requestChangePassword = async (req, res) => {
 
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    // Only normal users can request
-    if (user.isGoogleUser) {
-      return res
-        .status(403)
-        .json({ message: "Google users cannot change password" });
-    }
-
     // Generate verification code
     const code = generateCode(); // e.g., 6-digit code
     user.verificationCode = code;
@@ -138,13 +123,6 @@ changePassword = async (req, res) => {
 
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ message: "User not found" });
-
-    // Only normal users can change password
-    if (user.isGoogleUser) {
-      return res
-        .status(403)
-        .json({ message: "Google users cannot change password" });
-    }
 
     // Verify code
     if (user.verificationCode !== code) {

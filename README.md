@@ -143,20 +143,6 @@ Base path:
 
 ---
 
-### Google OAuth Login
-
-**POST** `/google`
-
-**Body**
-
-```json
-{
-  "tokenId": "GOOGLE_ID_TOKEN"
-}
-```
-
----
-
 ## 👤 USER ROUTES
 
 Base path:
