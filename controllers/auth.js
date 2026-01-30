@@ -19,11 +19,9 @@ const genToken = (user) => {
  * @desc Register user + send verification code
  */
 register = async (req, res) => {
-  console.log("registration initiated111");
   try {
     const { fullName, userName, email, phoneNumber, country, password } =
       req.body;
-    console.log("registration initiated222");
     if (!userName || !email || !password) {
       return res.status(400).json({ message: "Missing fields" });
     }
@@ -69,6 +67,7 @@ register = async (req, res) => {
       });
 
     res.status(201).json({
+      success: true,
       message: "Account created. Verification code sent to your email.",
       userId: user._id,
     });
