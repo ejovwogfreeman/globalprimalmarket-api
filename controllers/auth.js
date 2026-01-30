@@ -113,11 +113,9 @@ verifyAccount = async (req, res) => {
       return res.status(400).json({ message: "Account already verified" });
 
     if (Number(code) === user.verificationCodeOld)
-      return res
-        .status(400)
-        .json({
-          message: "Verification code already used, please request a new one",
-        });
+      return res.status(400).json({
+        message: "Verification code already used, please request a new one",
+      });
 
     if (user.verificationCode !== Number(code))
       return res.status(400).json({ message: "Invalid verification code" });
@@ -150,7 +148,9 @@ verifyAccount = async (req, res) => {
         userId: user._id,
       });
 
-    res.status(200).json({ message: "Account verified successfully!" });
+    res
+      .status(200)
+      .json({ success: true, message: "Account verified successfully!" });
   } catch (err) {
     console.error("Verify error:", err);
     res.status(500).json({ message: "Verification failed" });
