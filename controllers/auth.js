@@ -228,7 +228,7 @@ login = async (req, res) => {
 
     if (!user.isVerified)
       return res
-        .status(401)
+        .status(200)
         .json({ message: "Please verify your email before logging in." });
 
     const ok = await user.comparePassword(password);
