@@ -20,7 +20,8 @@ const genToken = (user) => {
  */
 register = async (req, res) => {
   try {
-    const { name, email, password, role } = req.body;
+    const { fullName, userName, email, phoneNumber, country, password } =
+      req.body;
 
     if (!name || !email || !password) {
       return res.status(400).json({ message: "Missing fields" });
@@ -32,14 +33,14 @@ register = async (req, res) => {
 
     // Generate verification code
     const verificationCode = generateCode();
-
     const user = await User.create({
-      name,
+      fullName,
+      userName,
       email,
+      phoneNumber,
+      country,
       password,
-      role,
       verificationCode,
-      isVerified: false,
     });
 
     // Email the verification code
