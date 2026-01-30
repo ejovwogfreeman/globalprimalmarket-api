@@ -5,6 +5,8 @@ const {
   register,
   verifyAccount,
   resendVerificationCode,
+  forgetPassword,
+  changePassword,
   login,
 } = require("../controllers/auth");
 const { protect } = require("../middlewares/auth");
@@ -29,6 +31,12 @@ router.post("/resend-verification", resendVerificationCode);
 // Normal login
 // Body: { email, password }
 router.post("/login", uploadNone, login);
+
+// Forget password (normal users only)
+router.post("/forget-password", forgetPassword);
+
+// Change password (normal users only)
+router.post("/change-password", changePassword);
 
 // ------------------------
 // Get logged-in user info

@@ -80,79 +80,6 @@ updateProfile = async (req, res) => {
   }
 };
 
-requestChangePassword = async (req, res) => {
-  try {
-    const { email } = req.body;
-
-    if (!email) {
-      return res.status(400).json({ message: "Email is required" });
-    }
-
-    // Find user by email
-    const user = await User.findOne({ email });
-
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    // Generate verification code (e.g., 6-digit)
-    const code = generateCode();
-    user.verificationCode = code;
-    await user.save();
-
-    await Email.send({
-      to: user.email,
-      subject: "Password Reset Request",
-      text: `You requested to change your password. Use this code: ${code} or click the link: ${resetLink}`,
-    });
-
-    res.json({
-      message:
-        "Password reset email sent. Check your inbox for the code or link.",
-    });
-  } catch (err) {
-    console.error("requestChangePassword error:", err);
-    res.status(500).json({ message: "Server error", error: err.message });
-  }
-};
-
-// ===============================
-// 2. Change Password
-// ===============================
-changePassword = async (req, res) => {
-  try {
-    const { email, code, newPassword } = req.body;
-
-    // Validate input
-    if (!email || !code || !newPassword) {
-      return res.status(400).json({ message: "All fields are required" });
-    }
-
-    // Find user by email
-    const user = await User.findOne({ email });
-    if (!user) return res.status(404).json({ message: "User not found" });
-
-    // Verify code
-    if (user.verificationCode !== Number(code)) {
-      return res.status(400).json({ message: "Invalid verification code" });
-    }
-
-    // Set new password (assuming hashing is handled in User model pre-save)
-    user.password = newPassword;
-
-    // Clear verification code
-    user.verificationCodeOld = user.verificationCode;
-    user.verificationCode = null;
-
-    await user.save();
-
-    res.json({ message: "Password changed successfully" });
-  } catch (err) {
-    console.error("changePassword error:", err);
-    res.status(500).json({ message: "Server error", error: err.message });
-  }
-};
-
 changeProfilePicture = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -202,7 +129,7 @@ changeProfilePicture = async (req, res) => {
 module.exports = {
   getMe,
   updateProfile,
-  requestChangePassword,
+  forgetPassword,
   changePassword,
   changeProfilePicture,
   changeProfilePicture,
