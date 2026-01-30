@@ -112,7 +112,7 @@ verifyAccount = async (req, res) => {
     if (user.isVerified)
       return res.status(400).json({ message: "Account already verified" });
 
-    if (user.verificationCode === user.verificationCodeOld)
+    if (code === user.verificationCodeOld)
       return res
         .status(400)
         .json({ message: "Verification code already used, request a new one" });
