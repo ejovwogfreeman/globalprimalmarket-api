@@ -82,18 +82,24 @@ updateProfile = async (req, res) => {
 
 requestChangePassword = async (req, res) => {
   try {
-    const userId = req.user._id;
-    const user = await User.findById(userId);
+    const { email } = req.body;
 
-    if (!user) return res.status(404).json({ message: "User not found" });
+    if (!email) {
+      return res.status(400).json({ message: "Email is required" });
+    }
 
-    // Generate verification code
-    const code = generateCode(); // e.g., 6-digit code
+    // Find user by email
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Generate verification code (e.g., 6-digit)
+    const code = generateCode();
     user.verificationCode = code;
     await user.save();
 
-    // Send email to user
-    const resetLink = `${process.env.FRONTEND_URL}/reset-password?userId=${user._id}&code=${code}`;
     await Email.send({
       to: user.email,
       subject: "Password Reset Request",
@@ -115,24 +121,27 @@ requestChangePassword = async (req, res) => {
 // ===============================
 changePassword = async (req, res) => {
   try {
-    const { userId, code, newPassword } = req.body;
+    const { email, code, newPassword } = req.body;
 
-    if (!userId || !code || !newPassword) {
+    // Validate input
+    if (!email || !code || !newPassword) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
-    const user = await User.findById(userId);
+    // Find user by email
+    const user = await User.findOne({ email });
     if (!user) return res.status(404).json({ message: "User not found" });
 
     // Verify code
-    if (user.verificationCode !== code) {
+    if (user.verificationCode !== Number(code)) {
       return res.status(400).json({ message: "Invalid verification code" });
     }
 
-    // Set new password (will be hashed automatically in the User model)
+    // Set new password (assuming hashing is handled in User model pre-save)
     user.password = newPassword;
 
     // Clear verification code
+    user.verificationCodeOld = user.verificationCode;
     user.verificationCode = null;
 
     await user.save();
