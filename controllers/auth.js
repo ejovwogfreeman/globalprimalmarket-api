@@ -34,7 +34,6 @@ register = async (req, res) => {
     if (exists) {
       return res.status(200).json({
         message: "Email already exists",
-        success: true, // optional, treat it as a "soft success"
         user: {
           email: exists.email,
           isVerified: exists.isVerified, // make sure this field exists in your User model
