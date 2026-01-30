@@ -3,7 +3,7 @@ const Notification = require("../models/notification");
 const jwt = require("jsonwebtoken");
 const Email = require("../middlewares/email");
 const generateCode = require("../middlewares/generateCode");
-const { forgetPassword, changePassword } = require("./user");
+// const { forgetPassword, changePassword } = require("./user");
 
 const genToken = (user) => {
   return jwt.sign(
@@ -288,22 +288,18 @@ forgetPassword = async (req, res) => {
       return res.status(400).json({ message: "Email is required" });
     }
 
-    // Find user by email
     const user = await User.findOne({ email });
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Generate verification code (e.g., 6-digit)
     const code = generateCode();
     user.verificationCode = code;
     await user.save();
 
-    await Email.send({
-      to: user.email,
-      subject: "Password Reset Request",
-      text: `You requested to change your password. Use this code: ${code} or click the link: ${resetLink}`,
+    await Email(user.email, "Forget Password", "forget_password.html", {
+      EMAIL: email,
     });
 
     res.json({
@@ -316,9 +312,6 @@ forgetPassword = async (req, res) => {
   }
 };
 
-// ===============================
-// 2. Change Password
-// ===============================
 changePassword = async (req, res) => {
   try {
     const { email, code, newPassword } = req.body;
@@ -330,27 +323,43 @@ changePassword = async (req, res) => {
 
     // Find user by email
     const user = await User.findOne({ email });
-    if (!user) return res.status(404).json({ message: "User not found" });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
 
     // Verify code
     if (user.verificationCode !== Number(code)) {
       return res.status(400).json({ message: "Invalid verification code" });
     }
 
-    // Set new password (assuming hashing is handled in User model pre-save)
+    // Update password (hashed via model pre-save)
     user.password = newPassword;
 
-    // Clear verification code
+    // Store old code (optional audit) and clear active code
     user.verificationCodeOld = user.verificationCode;
     user.verificationCode = null;
 
     await user.save();
+
+    // ✅ Send confirmation email
+    await Email(
+      user.email,
+      "Password Changed Successfully",
+      "password_change.html",
+      {
+        EMAIL: email,
+      },
+    );
 
     res.json({ message: "Password changed successfully" });
   } catch (err) {
     console.error("changePassword error:", err);
     res.status(500).json({ message: "Server error", error: err.message });
   }
+};
+
+module.exports = {
+  changePassword,
 };
 
 module.exports = {
