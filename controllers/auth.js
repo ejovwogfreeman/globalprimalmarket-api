@@ -26,19 +26,29 @@ register = async (req, res) => {
       return res.status(400).json({ message: "Missing fields" });
     }
 
-    // const exists = await User.findOne({ email });
-    // if (exists)
-    //   return res.status(400).json({ message: "Email already exists" });
-
     const exists = await User.findOne({ email });
+
     if (exists) {
-      return res.status(200).json({
-        message: "Email already exists",
-        user: {
-          email: exists.email,
-          isVerified: exists.isVerified, // make sure this field exists in your User model
-        },
-      });
+      if (!exists.isVerified) {
+        // User exists but not verified
+        return res.status(200).json({
+          message:
+            "Email already exists but not verified. Please verify your email.",
+          user: {
+            email: exists.email,
+            isVerified: exists.isVerified,
+          },
+        });
+      } else {
+        // User exists and already verified
+        return res.status(400).json({
+          message: "Email already exists and is verified. Please login.",
+          user: {
+            email: exists.email,
+            isVerified: exists.isVerified,
+          },
+        });
+      }
     }
 
     // Generate verification code
