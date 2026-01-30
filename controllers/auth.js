@@ -227,9 +227,14 @@ login = async (req, res) => {
     if (!user) return res.status(401).json({ message: "Invalid credentials" });
 
     if (!user.isVerified)
-      return res
-        .status(200)
-        .json({ message: "Please verify your email before logging in...." });
+      return res.status(200).json({
+        status: success,
+        message: "Please verify your email before logging in.",
+        user: {
+          email: exists.email,
+          isVerified: exists.isVerified,
+        },
+      });
 
     const ok = await user.comparePassword(password);
     if (!ok) return res.status(401).json({ message: "Invalid credentials" });
