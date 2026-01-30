@@ -128,7 +128,7 @@ verifyAccount = async (req, res) => {
     // Email the verification code
     await Email(
       user.email,
-      "Verify Your Account",
+      "Account Verified Successfully",
       "verify.html",
       { EMAIL: email }, // dynamic value
     );
