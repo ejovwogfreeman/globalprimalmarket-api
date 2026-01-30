@@ -300,11 +300,12 @@ forgetPassword = async (req, res) => {
 
     await Email(user.email, "Forget Password", "forget_password.html", {
       EMAIL: email,
+      CODE: verificationCode,
     });
 
     res.json({
-      message:
-        "Password reset email sent. Check your inbox for the code or link.",
+      success: true,
+      message: "Password reset email sent. Check your inbox for the code.",
     });
   } catch (err) {
     console.error("requestChangePassword error:", err);
@@ -351,7 +352,7 @@ changePassword = async (req, res) => {
       },
     );
 
-    res.json({ message: "Password changed successfully" });
+    res.json({ success: true, message: "Password changed successfully" });
   } catch (err) {
     console.error("changePassword error:", err);
     res.status(500).json({ message: "Server error", error: err.message });
