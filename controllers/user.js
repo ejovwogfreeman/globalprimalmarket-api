@@ -130,5 +130,4 @@ module.exports = {
   getMe,
   updateProfile,
   changeProfilePicture,
-  changeProfilePicture,
 };
