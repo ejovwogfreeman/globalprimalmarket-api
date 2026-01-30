@@ -258,6 +258,7 @@ login = async (req, res) => {
       });
 
     res.json({
+      success: true,
       token: genToken(user),
       user: {
         id: user._id,
