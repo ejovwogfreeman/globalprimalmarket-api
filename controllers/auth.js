@@ -19,11 +19,12 @@ const genToken = (user) => {
  * @desc Register user + send verification code
  */
 register = async (req, res) => {
+  console.log("registration initiated111");
   try {
     const { fullName, userName, email, phoneNumber, country, password } =
       req.body;
-
-    if (!name || !email || !password) {
+    console.log("registration initiated222");
+    if (!userName || !email || !password) {
       return res.status(400).json({ message: "Missing fields" });
     }
 
