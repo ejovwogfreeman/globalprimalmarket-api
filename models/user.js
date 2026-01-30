@@ -9,6 +9,7 @@ const UserSchema = new mongoose.Schema({
   country: { type: String },
   password: { type: String, required: true },
   verificationCode: { type: Number },
+  verificationCodeOld: { type: Number },
   isVerified: { type: Boolean, default: false },
   balance: { type: Number, default: 0 },
   role: { type: String, enum: ["user", "admin"], default: "user" },

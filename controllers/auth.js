@@ -61,6 +61,7 @@ register = async (req, res) => {
       country,
       password,
       verificationCode,
+      verificationCodeOld: null,
     });
 
     // Email the verification code
@@ -111,7 +112,10 @@ verifyAccount = async (req, res) => {
     if (user.isVerified)
       return res.status(400).json({ message: "Account already verified" });
 
-    if (!user.verificationCode || user.verificationCode === null)
+    if (
+      !user.verificationCode ||
+      user.verificationCode === user.verificationCodeOld
+    )
       return res
         .status(400)
         .json({ message: "Verification code already used, request a new one" });
@@ -120,6 +124,7 @@ verifyAccount = async (req, res) => {
       return res.status(400).json({ message: "Invalid verification code" });
 
     user.isVerified = true;
+    user.verificationCodeOld = user.verificationCode;
     user.verificationCode = null;
     await user.save();
 
@@ -203,6 +208,7 @@ resendVerificationCode = async (req, res) => {
     }
 
     res.status(200).json({
+      success: true,
       message: "Verification code resent successfully",
     });
   } catch (err) {
