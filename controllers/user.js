@@ -129,8 +129,6 @@ changeProfilePicture = async (req, res) => {
 module.exports = {
   getMe,
   updateProfile,
-  forgetPassword,
-  changePassword,
   changeProfilePicture,
   changeProfilePicture,
 };
