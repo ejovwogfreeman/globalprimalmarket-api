@@ -219,6 +219,66 @@ resendVerificationCode = async (req, res) => {
 /**
  * @desc Login with email/password
  */
+// login = async (req, res) => {
+//   try {
+//     const { email, password } = req.body;
+
+//     const user = await User.findOne({ email });
+//     if (!user) return res.status(401).json({ message: "Invalid credentials" });
+
+//     if (!user.isVerified)
+//       return res.status(200).json({
+//         success: true,
+//         message: "Please verify your email before logging in.",
+//         user: {
+//           email: user.email,
+//           isVerified: user.isVerified,
+//         },
+//       });
+
+//     const ok = await user.comparePassword(password);
+//     if (!ok) return res.status(401).json({ message: "Invalid credentials" });
+
+//     // Email the verification code
+//     await Email(
+//       user.email,
+//       "Login Successful",
+//       "login.html",
+//       { EMAIL: email }, // dynamic value
+//     );
+
+//     await Notification.create({
+//       user: user._id,
+//       title: "Login Successful",
+//       message: `You logged in successfully.`,
+//       meta: { userId: user._id },
+//     });
+
+//     if (global.io)
+//       global.io.emit("notification", {
+//         type: "user_login",
+//         title: "User Logged In",
+//         message: `${user.name} logged in.`,
+//         userId: user._id,
+//       });
+
+//     res.json({
+//       success: true,
+//       token: genToken(user),
+//       user: {
+//         id: user._id,
+//         email: user.email,
+//         name: user.name,
+//         role: user.role,
+//         isVerified: user.isVerified,
+//       },
+//     });
+//   } catch (err) {
+//     console.error("Login error:", err);
+//     res.status(500).json({ message: "Server error" });
+//   }
+// };
+
 login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -226,7 +286,8 @@ login = async (req, res) => {
     const user = await User.findOne({ email });
     if (!user) return res.status(401).json({ message: "Invalid credentials" });
 
-    if (!user.isVerified)
+    // 🚫 STOP HERE if not verified
+    if (!user.isVerified) {
       return res.status(200).json({
         success: true,
         message: "Please verify your email before logging in.",
@@ -235,34 +296,32 @@ login = async (req, res) => {
           isVerified: user.isVerified,
         },
       });
+    }
 
+    // ✅ Only verified users reach here
     const ok = await user.comparePassword(password);
     if (!ok) return res.status(401).json({ message: "Invalid credentials" });
 
-    // Email the verification code
-    await Email(
-      user.email,
-      "Login Successful",
-      "login.html",
-      { EMAIL: email }, // dynamic value
-    );
+    // ✅ Send email ONLY for verified users
+    await Email(user.email, "Login Successful", "login.html", { EMAIL: email });
 
     await Notification.create({
       user: user._id,
       title: "Login Successful",
-      message: `You logged in successfully.`,
+      message: "You logged in successfully.",
       meta: { userId: user._id },
     });
 
-    if (global.io)
+    if (global.io) {
       global.io.emit("notification", {
         type: "user_login",
         title: "User Logged In",
         message: `${user.name} logged in.`,
         userId: user._id,
       });
+    }
 
-    res.json({
+    return res.json({
       success: true,
       token: genToken(user),
       user: {
@@ -275,7 +334,7 @@ login = async (req, res) => {
     });
   } catch (err) {
     console.error("Login error:", err);
-    res.status(500).json({ message: "Server error" });
+    return res.status(500).json({ message: "Server error" });
   }
 };
 
