@@ -231,8 +231,8 @@ login = async (req, res) => {
         success: true,
         message: "Please verify your email before logging in.",
         user: {
-          email: exists.email,
-          isVerified: exists.isVerified,
+          email: user.email,
+          isVerified: user.isVerified,
         },
       });
 
