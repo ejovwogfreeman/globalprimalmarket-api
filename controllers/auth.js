@@ -115,7 +115,7 @@ verifyAccount = async (req, res) => {
 
     if (Number(code) === user.verificationCodeOld)
       return res.status(400).json({
-        message: "Verification code already used, please request a new one",
+        message: "Verification code expired, please request a new one",
       });
 
     if (user.verificationCode !== Number(code))
@@ -327,6 +327,11 @@ changePassword = async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
+
+    if (Number(code) === user.verificationCodeOld)
+      return res.status(400).json({
+        message: "Verification code expired, please request a new one",
+      });
 
     // Verify code
     if (user.verificationCode !== Number(code)) {
