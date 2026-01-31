@@ -346,7 +346,7 @@ changePassword = async (req, res) => {
     await Email(
       user.email,
       "Password Changed Successfully",
-      "password_change.html",
+      "change_password.html",
       {
         EMAIL: email,
       },
