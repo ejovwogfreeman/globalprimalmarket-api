@@ -365,10 +365,6 @@ changePassword = async (req, res) => {
 };
 
 module.exports = {
-  changePassword,
-};
-
-module.exports = {
   register,
   verifyAccount,
   resendVerificationCode,
