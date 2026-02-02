@@ -1,9 +1,7 @@
 const User = require("../models/user");
-const Notification = require("../models/notification");
 const jwt = require("jsonwebtoken");
 const Email = require("../middlewares/email");
 const generateCode = require("../middlewares/generateCode");
-// const { forgetPassword, changePassword } = require("./user");
 
 const genToken = (user) => {
   return jwt.sign(
@@ -266,13 +264,7 @@ login = async (req, res) => {
     return res.json({
       success: true,
       token: genToken(user),
-      user: {
-        id: user._id,
-        email: user.email,
-        name: user.name,
-        role: user.role,
-        isVerified: user.isVerified,
-      },
+      user,
     });
   } catch (err) {
     console.error("Login error:", err);
