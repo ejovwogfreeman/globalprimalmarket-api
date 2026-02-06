@@ -6,6 +6,7 @@ const {
   createInvestment,
   createWithdrawal,
   getMyTransactions,
+  getTransaction,
   getAllTransactions,
   updateTransactionStatus,
 } = require("../controllers/transactions");
@@ -18,6 +19,7 @@ router.post("/withdrawal", protect, createWithdrawal);
 router.post("/investment", protect, createInvestment);
 
 router.get("/me", protect, getMyTransactions);
+router.get("/:id", protect, getTransaction);
 router.get("/", protect, authorize("admin"), getAllTransactions);
 
 router.patch(

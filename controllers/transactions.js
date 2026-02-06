@@ -152,6 +152,45 @@ exports.getAllTransactions = async (req, res) => {
   }
 };
 
+// GET /transactions/:id
+exports.getTransaction = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Find the transaction by ID
+    const transaction = await Transaction.findById(id).populate(
+      "user",
+      "name email",
+    );
+
+    if (!transaction) {
+      return res.status(404).json({
+        success: false,
+        message: "Transaction not found",
+      });
+    }
+
+    // Optional: ensure the transaction belongs to the logged-in user
+    // if (transaction.user._id.toString() !== req.user.id) {
+    //   return res.status(403).json({
+    //     success: false,
+    //     message: "Unauthorized access",
+    //   });
+    // }
+
+    return res.status(200).json({
+      success: true,
+      transaction,
+    });
+  } catch (error) {
+    console.error("Get transaction error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
+  }
+};
+
 exports.updateTransactionStatus = async (req, res) => {
   try {
     const { status } = req.body;
