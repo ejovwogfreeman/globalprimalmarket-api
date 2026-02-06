@@ -115,6 +115,7 @@ exports.createInvestment = async (req, res) => {
       type: "investment",
       amount,
       plan,
+      status: "in progress",
     });
 
     return res.status(201).json({
