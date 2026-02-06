@@ -9,7 +9,7 @@ const {
   getAllTransactions,
   updateTransactionStatus,
 } = require("../controllers/transactions");
-const { uploadTransactionFiles, uploadNone } = require("../middlewares/upload");
+const { uploadTransactionFiles } = require("../middlewares/upload");
 
 const router = express.Router();
 
