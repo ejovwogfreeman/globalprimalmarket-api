@@ -1,23 +1,30 @@
 const express = require("express");
 const upload = require("../middlewares/upload");
-const auth = require("../middlewares/auth");
-const admin = require("../middlewares/admin");
-const controller = require("../controllers/transaction.controller");
+const { protect, authorize } = require("../middlewares/auth");
+const {
+  createDeposit,
+  createInvestment,
+  createWithdrawal,
+  getMyTransactions,
+  getAllTransactions,
+  updateTransactionStatus,
+} = require("../controllers/transactions");
+const { uploadTransactionFiles, uploadNone } = require("../middlewares/upload");
 
 const router = express.Router();
 
-router.post("/deposit", auth, upload.single("proof"), controller.createDeposit);
-router.post(
-  "/withdrawal",
-  auth,
-  upload.single("proof"),
-  controller.createWithdrawal,
+router.post("/deposit", protect, uploadTransactionFiles, createDeposit);
+router.post("/withdrawal", protect, createWithdrawal);
+router.post("/investment", protect, createInvestment);
+
+router.get("/me", protect, getMyTransactions);
+router.get("/", protect, authorize("admin"), getAllTransactions);
+
+router.patch(
+  "/:id/status",
+  protect,
+  authorize("admin"),
+  updateTransactionStatus,
 );
-router.post("/investment", auth, controller.createInvestment);
-
-router.get("/me", auth, controller.getMyTransactions);
-router.get("/", auth, admin, controller.getAllTransactions);
-
-router.patch("/:id/status", auth, admin, controller.updateTransactionStatus);
 
 module.exports = router;

@@ -1,6 +1,6 @@
 // controllers/messageController.js
-const Message = require("../models/Message");
-const Chat = require("../models/Chat");
+const Message = require("../models/message");
+const Chat = require("../models/chat");
 const { uploadImages, uploadVideos } = require("../middlewares/cloudinary");
 
 // ==========================
@@ -52,7 +52,7 @@ sendMessage = async (req, res) => {
     const chat = await Chat.findByIdAndUpdate(
       chatId,
       { lastMessage: message._id, updatedAt: new Date() },
-      { new: true }
+      { new: true },
     ).populate("participants", "username email avatar");
 
     // -----------------------------
@@ -60,7 +60,7 @@ sendMessage = async (req, res) => {
     // -----------------------------
     // Find the other participant
     const otherUser = chat.participants.find(
-      (user) => user._id.toString() !== sender.toString()
+      (user) => user._id.toString() !== sender.toString(),
     );
 
     if (otherUser) {
@@ -132,7 +132,7 @@ updateMessage = async (req, res) => {
 
     const updatedMessage = await Message.findById(messageId).populate(
       "sender",
-      "username avatar email"
+      "username avatar email",
     );
 
     res.json({
