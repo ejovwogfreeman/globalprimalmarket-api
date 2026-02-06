@@ -37,15 +37,16 @@ getMe = async (req, res) => {
 updateProfile = async (req, res) => {
   try {
     const userId = req.user._id;
-    const { name, address, phoneNumber } = req.body;
+    const { fullName, userName, phoneNumber, country } = req.body;
 
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ message: "User not found" });
 
     // Update allowed fields
-    if (name) user.name = name;
-    if (address) user.address = address;
+    if (fullName) user.fullName = fullName;
+    if (userName) user.userName = userName;
     if (phoneNumber) user.phoneNumber = phoneNumber;
+    if (country) user.country = country;
 
     await user.save();
 
@@ -61,7 +62,7 @@ updateProfile = async (req, res) => {
         title: "User Profile Updated",
         message: `${user.name} updated their profile information`,
         meta: {
-          updatedFields: { name, address, phoneNumber },
+          updatedFields: { fullName, userName, phoneNumber, country },
           userId: user._id,
         },
       });
