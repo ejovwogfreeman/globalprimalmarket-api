@@ -134,7 +134,7 @@ exports.getMyTransactions = async (req, res) => {
       user: req.user.id,
     }).sort({ createdAt: -1 });
 
-    return res.json(transactions);
+    return res.json({ success: true, transactions });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
@@ -146,7 +146,7 @@ exports.getAllTransactions = async (req, res) => {
       .populate("user", "email balance")
       .sort({ createdAt: -1 });
 
-    return res.json(transactions);
+    return res.json({ success: true, transactions });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
