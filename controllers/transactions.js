@@ -3,6 +3,7 @@ const User = require("../models/user");
 const { uploadImages } = require("../middlewares/cloudinary");
 
 exports.createDeposit = async (req, res) => {
+  console.log(res);
   try {
     const { amount, mode } = req.body;
     const user = req.user._id;
@@ -38,9 +39,9 @@ exports.createDeposit = async (req, res) => {
       status: "pending",
     };
 
-    const transaction = await Transaction.create(transactionData);
+    console.log(transactionData);
 
-    console.log(res);
+    const transaction = await Transaction.create(transactionData);
 
     return res.status(201).json({
       success: true,
@@ -58,13 +59,7 @@ exports.createDeposit = async (req, res) => {
 
 exports.createWithdrawal = async (req, res) => {
   try {
-    const { amount, mode } = req.body;
-
-    if (!req.file) {
-      return res.status(400).json({
-        message: "Proof is required for withdrawal",
-      });
-    }
+    const { amount, mode, address } = req.body;
 
     if (!amount || amount <= 0) {
       return res.status(400).json({
@@ -83,7 +78,6 @@ exports.createWithdrawal = async (req, res) => {
       user: req.user.id,
       type: "withdrawal",
       amount,
-      proof: req.file.path,
       mode,
     });
 

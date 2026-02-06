@@ -30,6 +30,10 @@ const transactionSchema = new mongoose.Schema(
       type: String,
     },
 
+    address: {
+      type: String,
+    },
+
     mode: {
       type: String,
     },
