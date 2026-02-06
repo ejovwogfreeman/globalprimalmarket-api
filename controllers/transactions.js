@@ -40,7 +40,10 @@ exports.createDeposit = async (req, res) => {
 
     const transaction = await Transaction.create(transactionData);
 
+    console.log(res);
+
     return res.status(201).json({
+      success: true,
       message: "Deposit submitted successfully",
       transaction,
     });
