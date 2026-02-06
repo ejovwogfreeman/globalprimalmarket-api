@@ -2,45 +2,89 @@ const Transaction = require("../models/transactions");
 const User = require("../models/user");
 const { uploadImages } = require("../middlewares/cloudinary");
 
+// exports.createDeposit = async (req, res) => {
+//   try {
+//     const { amount, mode } = req.body;
+//     const user = req.user._id;
+
+//     // ---- VALIDATION ----
+//     if (!amount || Number(amount) <= 0) {
+//       return res.status(400).json({
+//         message: "Invalid amount",
+//       });
+//     }
+
+//     if (!req.files?.images || req.files.images.length === 0) {
+//       return res.status(400).json({
+//         message: "Deposit proof image is required",
+//       });
+//     }
+
+//     // ---- FILES ----
+//     const images = req.files.images;
+//     let uploadedProofs = [];
+
+//     if (images.length > 0) {
+//       uploadedProofs = await uploadImages(images, "deposits/proofs");
+//     }
+
+//     // ---- TRANSACTION DATA ----
+//     const transactionData = {
+//       user,
+//       type: "deposit",
+//       amount,
+//       mode, // bank, crypto, transfer
+//       proofs: uploadedProofs, // array of uploaded images
+//       status: "pending",
+//     };
+
+//     const transaction = await Transaction.create(transactionData);
+
+//     return res.status(201).json({
+//       message: "Deposit submitted successfully",
+//       transaction,
+//     });
+//   } catch (error) {
+//     console.error("Create deposit error:", error);
+//     return res.status(500).json({
+//       message: "Error submitting deposit",
+//       error,
+//     });
+//   }
+// };
+
 exports.createDeposit = async (req, res) => {
   try {
     const { amount, mode } = req.body;
-    const user = req.user._id;
 
-    // ---- VALIDATION ----
+    console.log("BODY:", req.body);
+    console.log("FILES:", req.files);
+
     if (!amount || Number(amount) <= 0) {
-      return res.status(400).json({
-        message: "Invalid amount",
-      });
+      return res.status(400).json({ message: "Invalid amount" });
     }
 
+    // ✅ THIS IS THE FIX
     if (!req.files?.images || req.files.images.length === 0) {
       return res.status(400).json({
         message: "Deposit proof image is required",
       });
     }
 
-    // ---- FILES ----
-    const images = req.files.images;
-    let uploadedProofs = [];
+    const images = req.files.images; // <-- ARRAY
+    const uploadedProofs = await uploadImages(images, "deposits/proofs");
 
-    if (images.length > 0) {
-      uploadedProofs = await uploadImages(images, "deposits/proofs");
-    }
-
-    // ---- TRANSACTION DATA ----
-    const transactionData = {
-      user,
+    const transaction = await Transaction.create({
+      user: req.user._id,
       type: "deposit",
       amount,
-      mode, // bank, crypto, transfer
-      proofs: uploadedProofs, // array of uploaded images
+      mode,
+      proofs: uploadedProofs,
       status: "pending",
-    };
-
-    const transaction = await Transaction.create(transactionData);
+    });
 
     return res.status(201).json({
+      success: true,
       message: "Deposit submitted successfully",
       transaction,
     });
@@ -48,7 +92,6 @@ exports.createDeposit = async (req, res) => {
     console.error("Create deposit error:", error);
     return res.status(500).json({
       message: "Error submitting deposit",
-      error,
     });
   }
 };
