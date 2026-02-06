@@ -3,10 +3,7 @@ const storage = multer.memoryStorage();
 
 const uploadTransactionFiles = multer({
   storage,
-}).fields([
-  { name: "images", maxCount: 10 },
-  { name: "video", maxCount: 1 },
-]);
+}).fields([{ name: "images", maxCount: 1 }]);
 
 const uploadChatAttachments = multer({
   storage,
