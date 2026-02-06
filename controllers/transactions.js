@@ -55,7 +55,7 @@ const { uploadImages } = require("../middlewares/cloudinary");
 
 exports.createDeposit = async (req, res) => {
   try {
-    const { amount, mode } = req.body;
+    const { amount, mode, images } = req.body; // images is a single object
     const user = req.user._id;
 
     // ---- VALIDATION ----
@@ -63,20 +63,17 @@ exports.createDeposit = async (req, res) => {
       return res.status(400).json({ message: "Invalid amount" });
     }
 
-    console.log(req.body);
-
-    if (!req.images) {
+    if (!images || typeof images !== "object") {
       return res.status(400).json({
         message: "Deposit proof image is required",
       });
     }
 
-    // ---- FILES ----
-    const images = req.images; // <-- Use req.images since that's what your frontend sends
+    // ---- UPLOAD FILE ----
     let uploadedProofs = [];
-
-    if (images.length > 0) {
-      uploadedProofs = await uploadImages(images, "deposits/proofs");
+    if (images.uri) {
+      // assuming uploadImages can accept a single object
+      uploadedProofs = await uploadImages([images], "deposits/proofs");
     }
 
     // ---- TRANSACTION DATA ----
@@ -85,7 +82,7 @@ exports.createDeposit = async (req, res) => {
       type: "deposit",
       amount,
       mode, // bank, crypto, transfer
-      proofs: uploadedProofs, // array of uploaded images
+      proofs: uploadedProofs, // array with uploaded image URL
       status: "pending",
     };
 
