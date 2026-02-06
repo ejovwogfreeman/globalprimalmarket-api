@@ -63,7 +63,7 @@ exports.createDeposit = async (req, res) => {
       return res.status(400).json({ message: "Invalid amount" });
     }
 
-    console.log(req);
+    console.log(req.body);
 
     if (!req.images) {
       return res.status(400).json({
