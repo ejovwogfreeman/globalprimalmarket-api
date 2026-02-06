@@ -1,4 +1,4 @@
-const Transaction = require("../models/transaction");
+const Transaction = require("../models/transactions");
 const User = require("../models/user");
 const { uploadImages } = require("../middlewares/cloudinary");
 
