@@ -2,6 +2,57 @@ const Transaction = require("../models/transactions");
 const User = require("../models/user");
 const { uploadImages } = require("../middlewares/cloudinary");
 
+// exports.createDeposit = async (req, res) => {
+//   try {
+//     const { amount, mode } = req.body;
+//     const user = req.user._id;
+
+//     // ---- VALIDATION ----
+//     if (!amount || Number(amount) <= 0) {
+//       return res.status(400).json({
+//         message: "Invalid amount",
+//       });
+//     }
+
+//     if (!req.files?.images) {
+//       return res.status(400).json({
+//         message: "Deposit proof image is required",
+//       });
+//     }
+
+//     // ---- FILES ----
+//     const images = req.files.images;
+//     let uploadedProofs = [];
+
+//     if (images.length > 0) {
+//       uploadedProofs = await uploadImages(images, "deposits/proofs");
+//     }
+
+//     // ---- TRANSACTION DATA ----
+//     const transactionData = {
+//       user,
+//       type: "deposit",
+//       amount,
+//       mode, // bank, crypto, transfer
+//       proofs: uploadedProofs, // array of uploaded images
+//       status: "pending",
+//     };
+
+//     const transaction = await Transaction.create(transactionData);
+
+//     return res.status(201).json({
+//       message: "Deposit submitted successfully",
+//       transaction,
+//     });
+//   } catch (error) {
+//     console.error("Create deposit error:", error);
+//     return res.status(500).json({
+//       message: "Error submitting deposit",
+//       error,
+//     });
+//   }
+// };
+
 exports.createDeposit = async (req, res) => {
   try {
     const { amount, mode } = req.body;
@@ -9,19 +60,17 @@ exports.createDeposit = async (req, res) => {
 
     // ---- VALIDATION ----
     if (!amount || Number(amount) <= 0) {
-      return res.status(400).json({
-        message: "Invalid amount",
-      });
+      return res.status(400).json({ message: "Invalid amount" });
     }
 
-    if (!req.files?.images) {
+    if (!req.images) {
       return res.status(400).json({
         message: "Deposit proof image is required",
       });
     }
 
     // ---- FILES ----
-    const images = req.files.images;
+    const images = req.images; // <-- Use req.images since that's what your frontend sends
     let uploadedProofs = [];
 
     if (images.length > 0) {
