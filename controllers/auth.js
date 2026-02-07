@@ -20,8 +20,15 @@ const genToken = (user) => {
  */
 register = async (req, res) => {
   try {
-    const { fullName, userName, email, phoneNumber, country, password } =
-      req.body;
+    const {
+      fullName,
+      userName,
+      email,
+      phoneNumber,
+      country,
+      countryFlag,
+      password,
+    } = req.body;
     if (!userName || !email || !password) {
       return res.status(400).json({ message: "Missing fields" });
     }
@@ -59,6 +66,7 @@ register = async (req, res) => {
       email,
       phoneNumber,
       country,
+      countryFlag,
       password,
       verificationCode,
       verificationCodeOld: null,
