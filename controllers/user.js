@@ -74,7 +74,7 @@ updateProfile = async (req, res) => {
       }
     }
 
-    res.json({ message: "User updated successfully", user });
+    res.json({ success: true, message: "User updated successfully", user });
   } catch (err) {
     console.error("Update user error:", err);
     res.status(500).json({ message: "Server error", error: err.message });
