@@ -10,7 +10,8 @@ const multer = require("multer");
 // Import routes
 const authRoutes = require("./routes/auth");
 // const propertyRoutes = require("./routes/property");
-const chatRoutes = require("./routes/chat");
+// const chatRoutes = require("./routes/chat");
+const userRoutes = require("./routes/user");
 const transactionRoutes = require("./routes/transactions");
 // const notificationRoutes = require("./routes/notification");
 // const escrowRoutes = require("./routes/escrow");
@@ -49,7 +50,8 @@ app.get("/api", (req, res) => res.send("RealEstate API is running 🚀"));
 // ------------------------
 app.use("/api/auth", authRoutes);
 // app.use("/api/property", propertyRoutes);
-app.use("/api/chat", chatRoutes);
+// app.use("/api/chat", chatRoutes);
+app.use("/api/user", userRoutes);
 app.use("/api/transactions", transactionRoutes);
 // app.use("/api/notification", notificationRoutes);
 // app.use("/api/escrow", escrowRoutes);
