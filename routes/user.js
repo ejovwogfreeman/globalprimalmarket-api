@@ -9,7 +9,7 @@ const {
   getMe,
   updateProfile,
   changeProfilePicture,
-} = require("../controllers/userController");
+} = require("../controllers/user");
 
 // Multer setup for single file upload (profile picture)
 const storage = multer.memoryStorage();
