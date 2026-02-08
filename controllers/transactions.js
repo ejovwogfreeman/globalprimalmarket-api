@@ -3,8 +3,68 @@ const User = require("../models/user");
 const { uploadImages } = require("../middlewares/cloudinary");
 const Email = require("../middlewares/email");
 
-exports.createDeposit = async (req, res) => {
-  console.log(res);
+// exports.createDeposit = async (req, res) => {
+//   console.log(res);
+//   try {
+//     const { amount, mode } = req.body;
+//     const user = req.user._id;
+
+//     // ---- VALIDATION ----
+//     if (!amount || Number(amount) <= 0) {
+//       return res.status(400).json({
+//         message: "Invalid amount",
+//       });
+//     }
+
+//     if (!req.files?.images || req.files.images.length === 0) {
+//       return res.status(400).json({
+//         message: "Deposit proof image is required",
+//       });
+//     }
+
+//     // ---- FILES ----
+//     const images = req.files.images;
+//     let uploadedProofs = [];
+
+//     if (images.length > 0) {
+//       uploadedProofs = await uploadImages(images, "deposits/proofs");
+//     }
+
+//     // ---- TRANSACTION DATA ----
+//     const transactionData = {
+//       user,
+//       type: "deposit",
+//       amount,
+//       mode, // bank, crypto, transfer
+//       proof: uploadedProofs, // array of uploaded images
+//       status: "pending",
+//     };
+
+//     const transaction = await Transaction.create(transactionData);
+
+//     // Email the verification code
+//     await Email(
+//       user.email,
+//       "Deposit Successful",
+//       "deposit.html",
+//       { EMAIL: user.email, AMOUNT: amount, CURRENCY: mode }, // dynamic value
+//     );
+
+//     return res.status(201).json({
+//       success: true,
+//       message: "Deposit submitted successfully",
+//       transaction,
+//     });
+//   } catch (error) {
+//     console.error("Create deposit error:", error);
+//     return res.status(500).json({
+//       message: "Error submitting deposit",
+//       error,
+//     });
+//   }
+// };
+
+export const createDeposit = async (req, res) => {
   try {
     const { amount, mode } = req.body;
     const user = req.user._id;
@@ -16,31 +76,24 @@ exports.createDeposit = async (req, res) => {
       });
     }
 
-    if (!req.files?.images || req.files.images.length === 0) {
+    if (!req.files || !req.files.images || req.files.images.length === 0) {
       return res.status(400).json({
+        success: false,
         message: "Deposit proof image is required",
       });
     }
 
-    // ---- FILES ----
-    const images = req.files.images;
-    let uploadedProofs = [];
+    // 👇 take ONLY the first image
+    const proofImage = req.files.images[0].path;
 
-    if (images.length > 0) {
-      uploadedProofs = await uploadImages(images, "deposits/proofs");
-    }
-
-    // ---- TRANSACTION DATA ----
-    const transactionData = {
-      user,
-      type: "deposit",
+    const deposit = await Transaction.create({
+      user: req.user._id,
       amount,
-      mode, // bank, crypto, transfer
-      proof: uploadedProofs, // array of uploaded images
+      mode,
+      type: "deposit",
+      proof: proofImage, // ✅ STRING, not array
       status: "pending",
-    };
-
-    const transaction = await Transaction.create(transactionData);
+    });
 
     // Email the verification code
     await Email(
@@ -52,14 +105,14 @@ exports.createDeposit = async (req, res) => {
 
     return res.status(201).json({
       success: true,
-      message: "Deposit submitted successfully",
-      transaction,
+      message: "Deposit created successfully",
+      data: deposit,
     });
-  } catch (error) {
-    console.error("Create deposit error:", error);
+  } catch (err) {
+    console.error("Create deposit error:", err);
     return res.status(500).json({
-      message: "Error submitting deposit",
-      error,
+      success: false,
+      message: "Something went wrong",
     });
   }
 };

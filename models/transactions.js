@@ -26,7 +26,12 @@ const transactionSchema = new mongoose.Schema(
       default: "pending",
     },
 
-    proof: [{ type: String, required: true }],
+    // proof: [{ type: String, required: true }],
+
+    proof: {
+      type: String,
+      required: true,
+    },
 
     address: {
       type: String,
