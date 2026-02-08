@@ -30,7 +30,7 @@ router.put("/update-profile", protect, uploadProfilePicture, updateProfile);
 router.post(
   "/change-profile-picture",
   protect,
-  upload.single("profilePicture"),
+  uploadProfilePicture,
   changeProfilePicture,
 );
 
