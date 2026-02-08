@@ -84,6 +84,8 @@ export const createDeposit = async (req, res) => {
     // ✅ take first image only
     const proofImage = req.files.images[0].path;
 
+    console.log(proofImage);
+
     const deposit = await Transaction.create({
       user: user._id,
       amount,
