@@ -6,7 +6,7 @@ const Email = require("../middlewares/email");
 exports.createDeposit = async (req, res) => {
   try {
     const { amount, mode } = req.body;
-    const user = req.user._id;
+    const user = req.user;
 
     // ---- VALIDATION ----
     if (!amount || Number(amount) <= 0) {
@@ -31,7 +31,7 @@ exports.createDeposit = async (req, res) => {
 
     // ---- TRANSACTION DATA ----
     const transactionData = {
-      user,
+      user: user._id,
       type: "deposit",
       amount,
       mode, // bank, crypto, transfer

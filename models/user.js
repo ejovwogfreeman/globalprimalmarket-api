@@ -14,7 +14,7 @@ const UserSchema = new mongoose.Schema({
   isVerified: { type: Boolean, default: false },
   balance: { type: Number, default: 0 },
   role: { type: String, enum: ["user", "admin"], default: "user" },
-  profilePicture: String,
+  profilePicture: [{ type: String, required: true }],
   createdAt: { type: Date, default: Date.now },
 });
 
