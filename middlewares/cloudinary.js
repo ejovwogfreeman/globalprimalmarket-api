@@ -1,38 +1,10 @@
 const cloudinary = require("../config/cloudinary");
 
 // Upload multiple images
-// const uploadImages = async (files, folder = "default/images") => {
-//   if (!files || files.length === 0) return [];
-
-//   const uploads = files.map(
-//     (file) =>
-//       new Promise((resolve, reject) => {
-//         cloudinary.uploader
-//           .upload_stream(
-//             {
-//               folder,
-//               resource_type: "image",
-//               transformation: [{ width: 1600, quality: "auto" }],
-//             },
-//             (err, result) => {
-//               if (err) return reject(err);
-//               resolve(result.secure_url);
-//             },
-//           )
-//           .end(file.buffer);
-//       }),
-//   );
-
-//   return Promise.all(uploads);
-// };
-
 const uploadImages = async (files, folder = "default/images") => {
-  if (!files) return [];
+  if (!files || files.length === 0) return [];
 
-  // Ensure it's always an array
-  const fileArray = Array.isArray(files) ? files : [files];
-
-  const uploads = fileArray.map(
+  const uploads = files.map(
     (file) =>
       new Promise((resolve, reject) => {
         cloudinary.uploader

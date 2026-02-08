@@ -1,11 +1,9 @@
 const multer = require("multer");
 const storage = multer.memoryStorage();
 
-// const uploadTransactionFiles = multer({
-//   storage,
-// }).fields([{ name: "images", maxCount: 1 }]);
-
-const uploadTransactionFile = multer({ storage }).single("image");
+const uploadTransactionFiles = multer({
+  storage,
+}).fields([{ name: "images", maxCount: 1 }]);
 
 const uploadChatAttachments = multer({
   storage,
@@ -22,7 +20,7 @@ const uploadProfilePicture = multer({
 const uploadNone = multer({ storage }).none();
 
 module.exports = {
-  uploadTransactionFile,
+  uploadTransactionFiles,
   uploadChatAttachments,
   uploadProfilePicture,
   uploadNone,
