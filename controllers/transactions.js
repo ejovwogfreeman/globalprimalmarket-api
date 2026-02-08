@@ -93,8 +93,8 @@ exports.createWithdrawal = async (req, res) => {
     // Email the verification code
     await Email(
       user.email,
-      "Deposit Successful",
-      "deposit.html",
+      "Withdraw Successful",
+      "withdraw.html",
       { EMAIL: user.email, AMOUNT: amount, CURRENCY: mode }, // dynamic value
     );
 
@@ -136,8 +136,8 @@ exports.createInvestment = async (req, res) => {
     // Email the verification code
     await Email(
       user.email,
-      "Deposit Successful",
-      "deposit.html",
+      "Investment Successful",
+      "investment.html",
       { EMAIL: user.email, AMOUNT: amount, CURRENCY: mode, PLAN_NAME: plan }, // dynamic value
     );
 
