@@ -10,11 +10,11 @@ const {
   getAllTransactions,
   updateTransactionStatus,
 } = require("../controllers/transactions");
-const { uploadTransactionFiles } = require("../middlewares/upload");
+const { uploadTransactionFile } = require("../middlewares/upload");
 
 const router = express.Router();
 
-router.post("/deposit", protect, uploadTransactionFiles, createDeposit);
+router.post("/deposit", protect, uploadTransactionFile, createDeposit);
 router.post("/withdrawal", protect, createWithdrawal);
 router.post("/investment", protect, createInvestment);
 
