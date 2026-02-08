@@ -93,7 +93,7 @@ changeProfilePicture = async (req, res) => {
     const user = req.user; // should come from your auth middleware
 
     // ---- VALIDATION ----
-    if (!req.files?.image || req.files.image.length === 0) {
+    if (!req.files?.images || req.files.images.length === 0) {
       return res.status(400).json({
         success: false,
         message: "Profile picture file is required",
