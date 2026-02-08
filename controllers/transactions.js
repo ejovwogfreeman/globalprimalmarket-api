@@ -67,36 +67,35 @@ const Email = require("../middlewares/email");
 export const createDeposit = async (req, res) => {
   try {
     const { amount, mode } = req.body;
-    const user = req.user; // ✅ full user object
 
-    // ---- VALIDATION ----
     if (!amount || Number(amount) <= 0) {
       return res.status(400).json({ message: "Invalid amount" });
     }
 
-    if (!req.files || !req.files.images || req.files.images.length === 0) {
+    if (!req.files?.images?.length) {
       return res.status(400).json({
         success: false,
         message: "Deposit proof image is required",
       });
     }
 
-    // ✅ take first image only
-    const proofImage = req.files.images[0].path;
+    // ✅ Get file from multer
+    const file = req.files.images[0];
 
+    // ✅ Upload to Cloudinary
+    const uploaded = await uploadToCloudinary(file.buffer);
+
+    // ✅ STRING from Cloudinary
+    const proof = uploaded.secure_url;
+
+    // 🔥 proof is NOW a real string
     const deposit = await Transaction.create({
-      user: user._id,
+      user: req.user._id,
       amount,
       mode,
       type: "deposit",
-      proof: proofImage, // ✅ string path
+      proof, // ✅ Cloudinary URL string
       status: "pending",
-    });
-
-    await Email(user.email, "Deposit Successful", "deposit.html", {
-      EMAIL: user.email,
-      AMOUNT: amount,
-      CURRENCY: mode,
     });
 
     return res.status(201).json({
