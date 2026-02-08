@@ -67,13 +67,11 @@ const Email = require("../middlewares/email");
 export const createDeposit = async (req, res) => {
   try {
     const { amount, mode } = req.body;
-    const user = req.user._id;
+    const user = req.user; // ✅ full user object
 
     // ---- VALIDATION ----
     if (!amount || Number(amount) <= 0) {
-      return res.status(400).json({
-        message: "Invalid amount",
-      });
+      return res.status(400).json({ message: "Invalid amount" });
     }
 
     if (!req.files || !req.files.images || req.files.images.length === 0) {
@@ -83,25 +81,23 @@ export const createDeposit = async (req, res) => {
       });
     }
 
-    // 👇 take ONLY the first image
+    // ✅ take first image only
     const proofImage = req.files.images[0].path;
 
     const deposit = await Transaction.create({
-      user: req.user._id,
+      user: user._id,
       amount,
       mode,
       type: "deposit",
-      proof: proofImage, // ✅ STRING, not array
+      proof: proofImage, // ✅ string path
       status: "pending",
     });
 
-    // Email the verification code
-    await Email(
-      user.email,
-      "Deposit Successful",
-      "deposit.html",
-      { EMAIL: user.email, AMOUNT: amount, CURRENCY: mode }, // dynamic value
-    );
+    await Email(user.email, "Deposit Successful", "deposit.html", {
+      EMAIL: user.email,
+      AMOUNT: amount,
+      CURRENCY: mode,
+    });
 
     return res.status(201).json({
       success: true,
