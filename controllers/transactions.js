@@ -3,115 +3,62 @@ const User = require("../models/user");
 const { uploadImages } = require("../middlewares/cloudinary");
 const Email = require("../middlewares/email");
 
-// exports.createDeposit = async (req, res) => {
-//   console.log(res);
-//   try {
-//     const { amount, mode } = req.body;
-//     const user = req.user._id;
-
-//     // ---- VALIDATION ----
-//     if (!amount || Number(amount) <= 0) {
-//       return res.status(400).json({
-//         message: "Invalid amount",
-//       });
-//     }
-
-//     if (!req.files?.images || req.files.images.length === 0) {
-//       return res.status(400).json({
-//         message: "Deposit proof image is required",
-//       });
-//     }
-
-//     // ---- FILES ----
-//     const images = req.files.images;
-//     let uploadedProofs = [];
-
-//     if (images.length > 0) {
-//       uploadedProofs = await uploadImages(images, "deposits/proofs");
-//     }
-
-//     // ---- TRANSACTION DATA ----
-//     const transactionData = {
-//       user,
-//       type: "deposit",
-//       amount,
-//       mode, // bank, crypto, transfer
-//       proof: uploadedProofs, // array of uploaded images
-//       status: "pending",
-//     };
-
-//     const transaction = await Transaction.create(transactionData);
-
-//     // Email the verification code
-//     await Email(
-//       user.email,
-//       "Deposit Successful",
-//       "deposit.html",
-//       { EMAIL: user.email, AMOUNT: amount, CURRENCY: mode }, // dynamic value
-//     );
-
-//     return res.status(201).json({
-//       success: true,
-//       message: "Deposit submitted successfully",
-//       transaction,
-//     });
-//   } catch (error) {
-//     console.error("Create deposit error:", error);
-//     return res.status(500).json({
-//       message: "Error submitting deposit",
-//       error,
-//     });
-//   }
-// };
-
-export const createDeposit = async (req, res) => {
+exports.createDeposit = async (req, res) => {
   try {
     const { amount, mode } = req.body;
-    const user = req.user; // ✅ full user object
+    const user = req.user._id;
 
     // ---- VALIDATION ----
     if (!amount || Number(amount) <= 0) {
-      return res.status(400).json({ message: "Invalid amount" });
+      return res.status(400).json({
+        message: "Invalid amount",
+      });
     }
 
-    if (!req.files || !req.files.images || req.files.images.length === 0) {
+    if (!req.files?.images || req.files.images.length === 0) {
       return res.status(400).json({
-        success: false,
         message: "Deposit proof image is required",
       });
     }
 
-    // ✅ take first image only
-    const proofImage =
-      req.files.images[0].secure_url || req.files.images[0].path;
+    // ---- FILES ----
+    const images = req.files.images;
+    let uploadedProofs = [];
 
-    console.log(proofImage);
+    if (images.length > 0) {
+      uploadedProofs = await uploadImages(images, "deposits/proofs");
+    }
 
-    const deposit = await Transaction.create({
-      user: user._id,
-      amount,
-      mode,
+    // ---- TRANSACTION DATA ----
+    const transactionData = {
+      user,
       type: "deposit",
-      proof: proofImage, // ✅ string path
+      amount,
+      mode, // bank, crypto, transfer
+      proof: uploadedProofs, // array of uploaded images
       status: "pending",
-    });
+    };
 
-    await Email(user.email, "Deposit Successful", "deposit.html", {
-      EMAIL: user.email,
-      AMOUNT: amount,
-      CURRENCY: mode,
-    });
+    const transaction = await Transaction.create(transactionData);
+
+    // Email the verification code
+    await Email(
+      user.email,
+      "Deposit Successful",
+      "deposit.html",
+      { EMAIL: user.email, AMOUNT: amount, CURRENCY: mode }, // dynamic value
+    );
 
     return res.status(201).json({
       success: true,
-      message: "Deposit created successfully",
-      data: deposit,
+      message: "Deposit submitted successfully",
+      transaction,
     });
-  } catch (err) {
-    console.error("Create deposit error:", err);
+  } catch (error) {
+    console.error("Create deposit error:", error);
     return res.status(500).json({
-      success: false,
-      message: "Something went wrong",
+      message: "Error submitting deposit",
+      error,
     });
   }
 };
