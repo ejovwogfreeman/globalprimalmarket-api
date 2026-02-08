@@ -2,6 +2,7 @@
 const express = require("express");
 const router = express.Router();
 const multer = require("multer");
+const { uploadProfilePicture } = require("../middlewares/upload");
 
 // Middlewares
 const { protect } = require("../middlewares/auth"); // middleware to get req.user from JWT
@@ -23,7 +24,7 @@ const upload = multer({ storage });
 router.get("/me", protect, getMe);
 
 // Update profile (normal users only)
-router.put("/update-profile", protect, updateProfile);
+router.put("/update-profile", protect, uploadProfilePicture, updateProfile);
 
 // Change profile picture (all users)
 router.post(

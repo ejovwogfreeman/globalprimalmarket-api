@@ -1,7 +1,7 @@
 const User = require("../models/user");
 const Notification = require("../models/notification");
 const jwt = require("jsonwebtoken");
-const Email = require("../middlewares/email");
+// const Email = require("../middlewares/email");
 // const generateCode = require("../middlewares/generateCode");
 const { uploadImages } = require("../middlewares/cloudinary");
 
