@@ -39,8 +39,6 @@ exports.createDeposit = async (req, res) => {
       status: "pending",
     };
 
-    console.log(transactionData);
-
     const transaction = await Transaction.create(transactionData);
 
     return res.status(201).json({
