@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Investment Successful</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: #f5f5f5;
+        padding: 20px;
+      }
+      .container {
+        max-width: 600px;
+        margin: auto;
+        background: #ffffff;
+        padding: 25px;
+        border-radius: 8px;
+      }
+      h2 {
+        color: #333;
+      }
+      p {
+        color: #555;
+      }
+      .highlight {
+        font-weight: bold;
+        color: #0f172a;
+      }
+      .note {
+        margin-top: 20px;
+        font-size: 14px;
+        color: #777;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>Investment Successful</h2>
+      <p>
+        Hi {{EMAIL}}, your investment of
+        <span class="highlight">{{AMOUNT}} {{CURRENCY}}</span>
+        has been successfully processed. Your plan
+        <span class="highlight">{{PLAN_NAME}}</span> is now active.
+      </p>
+      <p class="note">
+        You can track your investment progress from your dashboard.
+      </p>
+    </div>
+  </body>
+</html>

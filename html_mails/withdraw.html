@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Withdrawal Successful</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: #f5f5f5;
+        padding: 20px;
+      }
+      .container {
+        max-width: 600px;
+        margin: auto;
+        background: #ffffff;
+        padding: 25px;
+        border-radius: 8px;
+      }
+      h2 {
+        color: #333;
+      }
+      p {
+        color: #555;
+      }
+      .highlight {
+        font-weight: bold;
+        color: #0f172a;
+      }
+      .note {
+        margin-top: 20px;
+        font-size: 14px;
+        color: #777;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>Withdrawal Successful</h2>
+      <p>
+        Hello {{EMAIL}}, your withdrawal request of
+        <span class="highlight">{{AMOUNT}} {{CURRENCY}}</span>
+        has been successfully processed. The funds have been sent to your linked
+        account.
+      </p>
+      <p class="note">
+        If you did not perform this transaction, please contact support
+        immediately.
+      </p>
+    </div>
+  </body>
+</html>

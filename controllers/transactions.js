@@ -1,6 +1,7 @@
 const Transaction = require("../models/transactions");
 const User = require("../models/user");
 const { uploadImages } = require("../middlewares/cloudinary");
+const Email = require("../middlewares/email");
 
 exports.createDeposit = async (req, res) => {
   console.log(res);
@@ -40,6 +41,14 @@ exports.createDeposit = async (req, res) => {
     };
 
     const transaction = await Transaction.create(transactionData);
+
+    // Email the verification code
+    await Email(
+      user.email,
+      "Deposit Successful",
+      "deposit.html",
+      { EMAIL: user.email, AMOUNT: amount, CURRENCY: mode }, // dynamic value
+    );
 
     return res.status(201).json({
       success: true,
@@ -81,6 +90,14 @@ exports.createWithdrawal = async (req, res) => {
       status: "pending",
     });
 
+    // Email the verification code
+    await Email(
+      user.email,
+      "Deposit Successful",
+      "deposit.html",
+      { EMAIL: user.email, AMOUNT: amount, CURRENCY: mode }, // dynamic value
+    );
+
     return res.status(201).json({
       success: true,
       message: "Withdrawal request submitted",
@@ -115,6 +132,14 @@ exports.createInvestment = async (req, res) => {
       plan,
       status: "in progress",
     });
+
+    // Email the verification code
+    await Email(
+      user.email,
+      "Deposit Successful",
+      "deposit.html",
+      { EMAIL: user.email, AMOUNT: amount, CURRENCY: mode, PLAN_NAME: plan }, // dynamic value
+    );
 
     return res.status(201).json({
       success: true,
