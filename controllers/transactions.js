@@ -51,7 +51,7 @@ exports.createDeposit = async (req, res) => {
 
     return res.status(201).json({
       success: true,
-      message: "Deposit submitted successfully",
+      message: "Deposit request submitted successfully",
       transaction,
     });
   } catch (error) {
@@ -99,7 +99,7 @@ exports.createWithdrawal = async (req, res) => {
 
     return res.status(201).json({
       success: true,
-      message: "Withdrawal request submitted",
+      message: "Withdrawal request submitted successfully",
       transaction,
     });
   } catch (error) {
@@ -142,7 +142,7 @@ exports.createInvestment = async (req, res) => {
 
     return res.status(201).json({
       success: true,
-      message: "Investment created successfully",
+      message: "Investment reequest submitted successfully",
       transaction,
     });
   } catch (error) {
