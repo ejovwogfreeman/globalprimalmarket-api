@@ -88,7 +88,7 @@ updateProfile = async (req, res) => {
   }
 };
 
-exports.changeProfilePicture = async (req, res) => {
+changeProfilePicture = async (req, res) => {
   try {
     const user = req.user; // should come from your auth middleware
 
