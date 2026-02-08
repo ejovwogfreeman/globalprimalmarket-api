@@ -82,7 +82,8 @@ export const createDeposit = async (req, res) => {
     }
 
     // ✅ take first image only
-    const proofImage = req.files.images[0].path;
+    const proofImage =
+      req.files.images[0].secure_url || req.files.images[0].path;
 
     console.log(proofImage);
 
