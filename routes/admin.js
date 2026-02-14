@@ -12,6 +12,12 @@ const {
   getSingleTransaction,
   updateTransactionStatus,
   deleteTransaction,
+  getAllBots,
+  getSingleBot,
+  createBot,
+  updateBot,
+  toggleBotStatus,
+  deleteBot,
 } = require("../controllers/admin");
 
 // Middlewares
@@ -57,5 +63,18 @@ router.delete(
   authorize("admin"),
   deleteTransaction,
 );
+
+router.get("/all-bots", protect, authorize("admin"), getAllBots);
+router.get("/bot/:id", protect, authorize("admin"), getSingleBot);
+router.post("/bot/create", protect, authorize("admin"), createBot);
+router.patch("/bot/update/:id", protect, authorize("admin"), updateBot);
+
+router.patch(
+  "/bot/toggle-status/:id",
+  protect,
+  authorize("admin"),
+  toggleBotStatus,
+);
+router.delete("/bot/delete/:id", protect, authorize("admin"), deleteBot);
 
 module.exports = router;
