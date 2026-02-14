@@ -13,6 +13,7 @@ const authRoutes = require("./routes/auth");
 // const chatRoutes = require("./routes/chat");
 const userRoutes = require("./routes/user");
 const transactionRoutes = require("./routes/transactions");
+const adminRoutes = require("./routes/admin");
 // const notificationRoutes = require("./routes/notification");
 // const escrowRoutes = require("./routes/escrow");
 
@@ -53,6 +54,7 @@ app.use("/api/auth", authRoutes);
 // app.use("/api/chat", chatRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/transactions", transactionRoutes);
+app.use("/api/admin", adminRoutes);
 // app.use("/api/notification", notificationRoutes);
 // app.use("/api/escrow", escrowRoutes);
 

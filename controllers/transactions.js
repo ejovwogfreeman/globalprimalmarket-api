@@ -162,18 +162,6 @@ exports.getMyTransactions = async (req, res) => {
   }
 };
 
-exports.getAllTransactions = async (req, res) => {
-  try {
-    const transactions = await Transaction.find()
-      .populate("user", "email balance")
-      .sort({ createdAt: -1 });
-
-    return res.json({ success: true, transactions });
-  } catch (error) {
-    return res.status(500).json({ message: error.message });
-  }
-};
-
 // GET /transactions/:id
 exports.getTransaction = async (req, res) => {
   try {
@@ -210,82 +198,5 @@ exports.getTransaction = async (req, res) => {
       success: false,
       message: "Server error",
     });
-  }
-};
-
-exports.updateTransactionStatus = async (req, res) => {
-  try {
-    const { status } = req.body;
-
-    if (!["pending", "approved", "rejected"].includes(status)) {
-      return res.status(400).json({
-        message: "Invalid status value",
-      });
-    }
-
-    const transaction = await Transaction.findById(req.params.id);
-    if (!transaction) {
-      return res.status(404).json({
-        message: "Transaction not found",
-      });
-    }
-
-    if (transaction.status === status) {
-      return res.status(400).json({
-        message: "Transaction already has this status",
-      });
-    }
-
-    const user = await User.findById(transaction.user);
-    if (!user) {
-      return res.status(404).json({
-        message: "User not found",
-      });
-    }
-
-    // APPLY BALANCE CHANGES
-    if (transaction.status === "pending" && status === "approved") {
-      if (transaction.type === "deposit") {
-        user.balance += transaction.amount;
-      }
-
-      if (
-        transaction.type === "withdrawal" ||
-        transaction.type === "investment"
-      ) {
-        if (user.balance < transaction.amount) {
-          return res.status(400).json({
-            message: "Insufficient balance",
-          });
-        }
-        user.balance -= transaction.amount;
-      }
-    }
-
-    // ROLLBACK
-    if (transaction.status === "approved" && status === "pending") {
-      if (transaction.type === "deposit") {
-        user.balance -= transaction.amount;
-      }
-
-      if (
-        transaction.type === "withdrawal" ||
-        transaction.type === "investment"
-      ) {
-        user.balance += transaction.amount;
-      }
-    }
-
-    transaction.status = status;
-
-    await user.save();
-    await transaction.save();
-
-    return res.json({
-      message: "Transaction status updated successfully",
-      transaction,
-    });
-  } catch (error) {
-    return res.status(500).json({ message: error.message });
   }
 };

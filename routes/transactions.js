@@ -7,8 +7,6 @@ const {
   createWithdrawal,
   getMyTransactions,
   getTransaction,
-  getAllTransactions,
-  updateTransactionStatus,
 } = require("../controllers/transactions");
 const { uploadTransactionFiles } = require("../middlewares/upload");
 
@@ -20,13 +18,5 @@ router.post("/investment", protect, createInvestment);
 
 router.get("/me", protect, getMyTransactions);
 router.get("/:id", protect, getTransaction);
-router.get("/", protect, authorize("admin"), getAllTransactions);
-
-router.patch(
-  "/:id/status",
-  protect,
-  authorize("admin"),
-  updateTransactionStatus,
-);
 
 module.exports = router;
