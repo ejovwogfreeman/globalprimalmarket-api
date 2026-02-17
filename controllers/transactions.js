@@ -118,9 +118,9 @@ exports.createInvestment = async (req, res) => {
     }
 
     const user = await User.findById(req.user.id);
-    if (!user || user.balance < amount) {
+    if (!user || user.balance[mode] < amount) {
       return res.status(400).json({
-        message: "Insufficient balance",
+        message: `Insufficient  ${mode} balance`,
       });
     }
 
