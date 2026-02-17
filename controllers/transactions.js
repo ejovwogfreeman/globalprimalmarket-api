@@ -109,7 +109,7 @@ exports.createWithdrawal = async (req, res) => {
 
 exports.createInvestment = async (req, res) => {
   try {
-    const { amount, plan } = req.body;
+    const { amount, mode, plan } = req.body;
 
     if (!amount || amount <= 0) {
       return res.status(400).json({
@@ -128,6 +128,7 @@ exports.createInvestment = async (req, res) => {
       user: req.user.id,
       type: "investment",
       amount,
+      mode,
       plan,
       status: "in progress",
     });

@@ -94,30 +94,88 @@ const deleteUser = async (req, res) => {
 /**
  * @desc Fund a user (admin only)
  */
+// const fundUser = async (req, res) => {
+//   try {
+//     if (req.user.role !== "admin") {
+//       return res.status(403).json({ message: "Access denied: Admins only" });
+//     }
+
+//     const { amount } = req.body;
+//     if (!amount || isNaN(amount)) {
+//       return res.status(400).json({ message: "Invalid amount" });
+//     }
+
+//     const user = await User.findById(req.params.id);
+//     if (!user) return res.status(404).json({ message: "User not found" });
+
+//     user.balance += parseFloat(amount);
+//     await user.save();
+
+//     // Optional: create a transaction record
+//     const transaction = await Transaction.create({
+//       user: user._id,
+//       amount: parseFloat(amount),
+//       type: "deposit",
+//       status: "approved",
+//       mode: "admin",
+//     });
+
+//     res.json({
+//       success: true,
+//       message: "User funded successfully",
+//       user,
+//       transaction,
+//     });
+//   } catch (err) {
+//     console.error("FundUser error:", err);
+//     res.status(500).json({ message: "Server error" });
+//   }
+// };
+
 const fundUser = async (req, res) => {
   try {
     if (req.user.role !== "admin") {
       return res.status(403).json({ message: "Access denied: Admins only" });
     }
 
-    const { amount } = req.body;
-    if (!amount || isNaN(amount)) {
+    const { amount, mode } = req.body;
+
+    if (!amount || isNaN(amount) || parseFloat(amount) <= 0) {
       return res.status(400).json({ message: "Invalid amount" });
     }
 
-    const user = await User.findById(req.params.id);
-    if (!user) return res.status(404).json({ message: "User not found" });
+    if (!mode || typeof mode !== "string") {
+      return res.status(400).json({ message: "Funding mode is required" });
+    }
 
-    user.balance += parseFloat(amount);
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const parsedAmount = parseFloat(amount);
+
+    // 🔥 Ensure balance object exists
+    if (!user.balance) {
+      user.balance = {};
+    }
+
+    // 🔥 Initialize mode balance if it doesn't exist
+    if (!user.balance[mode]) {
+      user.balance[mode] = 0;
+    }
+
+    // ✅ Update only the selected mode balance
+    user.balance[mode] += parsedAmount;
+
     await user.save();
 
-    // Optional: create a transaction record
     const transaction = await Transaction.create({
       user: user._id,
-      amount: parseFloat(amount),
+      amount: parsedAmount,
       type: "deposit",
       status: "approved",
-      mode: "admin",
+      mode,
     });
 
     res.json({
@@ -304,6 +362,7 @@ const createBot = async (req, res) => {
       name,
       description,
       price,
+      mode,
       dailyReturnPercent,
       durationDays,
       maxReturnPercent,
@@ -333,6 +392,7 @@ const createBot = async (req, res) => {
       name,
       description,
       price,
+      mode,
       dailyReturnPercent,
       durationDays,
       maxReturnPercent,

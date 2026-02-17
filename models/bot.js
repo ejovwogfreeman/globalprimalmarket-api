@@ -17,6 +17,9 @@ const botSchema = new mongoose.Schema(
       min: 50,
       max: 1000,
     },
+    mode: {
+      type: String,
+    },
     dailyReturnPercent: {
       type: Number,
       required: true,
