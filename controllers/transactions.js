@@ -138,7 +138,7 @@ exports.createInvestment = async (req, res) => {
       user.email,
       "Investment Successful",
       "investment.html",
-      { EMAIL: user.email, AMOUNT: amount, PLAN_NAME: plan }, // dynamic value
+      { EMAIL: user.email, AMOUNT: amount, CURRENCY: mode, PLAN_NAME: plan }, // dynamic value
     );
 
     return res.status(201).json({
