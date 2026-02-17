@@ -91,47 +91,6 @@ const deleteUser = async (req, res) => {
   }
 };
 
-/**
- * @desc Fund a user (admin only)
- */
-// const fundUser = async (req, res) => {
-//   try {
-//     if (req.user.role !== "admin") {
-//       return res.status(403).json({ message: "Access denied: Admins only" });
-//     }
-
-//     const { amount } = req.body;
-//     if (!amount || isNaN(amount)) {
-//       return res.status(400).json({ message: "Invalid amount" });
-//     }
-
-//     const user = await User.findById(req.params.id);
-//     if (!user) return res.status(404).json({ message: "User not found" });
-
-//     user.balance += parseFloat(amount);
-//     await user.save();
-
-//     // Optional: create a transaction record
-//     const transaction = await Transaction.create({
-//       user: user._id,
-//       amount: parseFloat(amount),
-//       type: "deposit",
-//       status: "approved",
-//       mode: "admin",
-//     });
-
-//     res.json({
-//       success: true,
-//       message: "User funded successfully",
-//       user,
-//       transaction,
-//     });
-//   } catch (err) {
-//     console.error("FundUser error:", err);
-//     res.status(500).json({ message: "Server error" });
-//   }
-// };
-
 const fundUser = async (req, res) => {
   try {
     if (req.user.role !== "admin") {
@@ -173,7 +132,7 @@ const fundUser = async (req, res) => {
     const transaction = await Transaction.create({
       user: user._id,
       amount: parsedAmount,
-      type: "deposit",
+      type: "funding",
       status: "approved",
       mode,
     });
@@ -243,6 +202,54 @@ const getSingleTransaction = async (req, res) => {
 /**
  * @desc Update transaction status (admin only)
  */
+// const updateTransactionStatus = async (req, res) => {
+//   try {
+//     const { status } = req.body;
+
+//     if (!["pending", "approved", "in progress", "declined"].includes(status)) {
+//       return res.status(400).json({ message: "Invalid status value" });
+//     }
+
+//     const transaction = await Transaction.findById(req.params.id);
+//     if (!transaction)
+//       return res.status(404).json({ message: "Transaction not found" });
+
+//     const user = await User.findById(transaction.user);
+//     if (!user) return res.status(404).json({ message: "User not found" });
+
+//     // Apply balance changes
+//     if (transaction.status === "pending" && status === "approved") {
+//       if (transaction.type === "deposit") user.balance += transaction.amount;
+//       if (["withdrawal", "investment"].includes(transaction.type)) {
+//         if (user.balance < transaction.amount)
+//           return res.status(400).json({ message: "Insufficient balance" });
+//         user.balance -= transaction.amount;
+//       }
+//     }
+
+//     // Rollback
+//     if (transaction.status === "approved" && status === "pending") {
+//       if (transaction.type === "deposit") user.balance -= transaction.amount;
+//       if (["withdrawal", "investment"].includes(transaction.type))
+//         user.balance += transaction.amount;
+//     }
+
+//     transaction.status = status;
+
+//     await user.save();
+//     await transaction.save();
+
+//     res.json({
+//       success: true,
+//       message: "Transaction status updated successfully",
+//       transaction,
+//     });
+//   } catch (err) {
+//     console.error("UpdateTransactionStatus error:", err);
+//     res.status(500).json({ message: "Server error" });
+//   }
+// };
+
 const updateTransactionStatus = async (req, res) => {
   try {
     const { status } = req.body;
@@ -258,21 +265,43 @@ const updateTransactionStatus = async (req, res) => {
     const user = await User.findById(transaction.user);
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    // Apply balance changes
+    // Ensure user.balance is an object
+    if (!user.balance || typeof user.balance !== "object") {
+      user.balance = {};
+    }
+
+    const mode = transaction.mode; // get the currency/mode of the transaction
+    if (!mode) {
+      return res.status(400).json({ message: "Transaction mode not defined" });
+    }
+
+    // Make sure the mode exists in the balance object
+    if (!user.balance[mode]) user.balance[mode] = 0;
+
+    // ===== Apply balance changes =====
+    // From pending → approved
     if (transaction.status === "pending" && status === "approved") {
-      if (transaction.type === "deposit") user.balance += transaction.amount;
+      if (transaction.type === "deposit") {
+        user.balance[mode] += transaction.amount;
+      }
       if (["withdrawal", "investment"].includes(transaction.type)) {
-        if (user.balance < transaction.amount)
-          return res.status(400).json({ message: "Insufficient balance" });
-        user.balance -= transaction.amount;
+        if (user.balance[mode] < transaction.amount) {
+          return res
+            .status(400)
+            .json({ message: `Insufficient ${mode} balance` });
+        }
+        user.balance[mode] -= transaction.amount;
       }
     }
 
-    // Rollback
+    // From approved → pending (rollback)
     if (transaction.status === "approved" && status === "pending") {
-      if (transaction.type === "deposit") user.balance -= transaction.amount;
-      if (["withdrawal", "investment"].includes(transaction.type))
-        user.balance += transaction.amount;
+      if (transaction.type === "deposit") {
+        user.balance[mode] -= transaction.amount;
+      }
+      if (["withdrawal", "investment"].includes(transaction.type)) {
+        user.balance[mode] += transaction.amount;
+      }
     }
 
     transaction.status = status;
