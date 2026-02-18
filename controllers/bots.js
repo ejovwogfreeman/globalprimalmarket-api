@@ -81,12 +81,11 @@ exports.purchaseBot = async (req, res) => {
       });
     }
 
-    // ---- FILE UPLOAD ----
-    const proofImages = req.files.proof;
+    const images = req.files.images;
     let uploadedProofs = [];
 
-    if (proofImages.length > 0) {
-      uploadedProofs = await uploadImages(proofImages, "purchases/proofs");
+    if (images.length > 0) {
+      uploadedProofs = await uploadImages(images, "purchase/proofs");
     }
 
     // ---- CREATE TRANSACTION ----
