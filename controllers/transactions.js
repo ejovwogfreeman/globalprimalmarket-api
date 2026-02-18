@@ -2,7 +2,6 @@ const Transaction = require("../models/transactions");
 const User = require("../models/user");
 const { uploadImages } = require("../middlewares/cloudinary");
 const Email = require("../middlewares/email");
-const Bot = require("../models/bot");
 
 exports.createDeposit = async (req, res) => {
   try {
