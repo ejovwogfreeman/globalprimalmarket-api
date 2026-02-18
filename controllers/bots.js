@@ -60,6 +60,9 @@ exports.purchaseBot = async (req, res) => {
       return res.status(400).json({ message: "Payment mode is required" });
     }
 
+    console.log(req);
+    console.log(req.files);
+
     if (!req.files?.proofs || req.files.proofs.length === 0) {
       return res
         .status(400)
