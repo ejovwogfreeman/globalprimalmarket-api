@@ -1,5 +1,6 @@
 const Bot = require("../models/bot");
 const Transaction = require("../models/transactions");
+const Email = require("../middlewares/email");
 const { uploadImages } = require("../middlewares/cloudinary");
 
 // GET /bots
