@@ -106,7 +106,7 @@ exports.purchaseBot = async (req, res) => {
     // await user.save();
 
     // ---- EMAIL ----
-    await Email(user.email, "Bot Purchase Submitted", "bot-purchase.html", {
+    await Email(user.email, "Bot Purchase Submitted", "botpurchase.html", {
       EMAIL: user.email,
       AMOUNT: amount,
       MODE: mode,
