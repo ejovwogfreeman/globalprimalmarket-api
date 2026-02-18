@@ -48,7 +48,7 @@ exports.getBot = async (req, res) => {
 
 exports.purchaseBot = async (req, res) => {
   try {
-    const { mode, amount } = req.body; // frontend sends amount and mode
+    const { mode, amount } = req.body;
     const user = req.user;
 
     // ---- VALIDATION ----
@@ -56,10 +56,29 @@ exports.purchaseBot = async (req, res) => {
       return res.status(400).json({ message: "Invalid amount" });
     }
 
+    if (!mode) {
+      return res.status(400).json({ message: "Payment mode is required" });
+    }
+
     if (!req.files?.proof || req.files.proof.length === 0) {
       return res
         .status(400)
         .json({ message: "Purchase proof image is required" });
+    }
+
+    // ---- CHECK USER BALANCE ----
+    const userBalance = user.balance?.[mode];
+
+    if (userBalance === undefined) {
+      return res.status(400).json({
+        message: `Invalid payment mode selected`,
+      });
+    }
+
+    if (Number(userBalance) < Number(amount)) {
+      return res.status(400).json({
+        message: `Insufficient ${mode} balance`,
+      });
     }
 
     // ---- FILE UPLOAD ----
@@ -70,19 +89,23 @@ exports.purchaseBot = async (req, res) => {
       uploadedProofs = await uploadImages(proofImages, "purchases/proofs");
     }
 
-    // ---- TRANSACTION DATA ----
+    // ---- CREATE TRANSACTION ----
     const transactionData = {
       user: user._id,
       type: "bot purchase",
-      amount, // amount sent from frontend
-      mode, // crypto symbol like BTC, ETH, etc.
-      proof: uploadedProofs, // array of uploaded images
-      status: "pending", // admin approval
+      amount,
+      mode,
+      proof: uploadedProofs,
+      status: "pending",
     };
 
     const transaction = await Transaction.create(transactionData);
 
-    // Optional: send email confirmation
+    // ---- OPTIONAL: DEDUCT BALANCE (if you want immediate deduction) ----
+    // user.balance[mode] -= Number(amount);
+    // await user.save();
+
+    // ---- EMAIL ----
     await Email(user.email, "Bot Purchase Submitted", "bot-purchase.html", {
       EMAIL: user.email,
       AMOUNT: amount,
@@ -99,7 +122,6 @@ exports.purchaseBot = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Error submitting bot purchase",
-      error,
     });
   }
 };
