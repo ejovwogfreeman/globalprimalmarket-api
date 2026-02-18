@@ -4,7 +4,7 @@ const { getAllBots, getBot } = require("../controllers/bots");
 
 const router = express.Router();
 
-router.get("/bots", protect, getAllBots);
-router.get("/bot/:id", protect, getBot);
+router.get("/", protect, getAllBots);
+router.get("/:id", protect, getBot);
 
 module.exports = router;
