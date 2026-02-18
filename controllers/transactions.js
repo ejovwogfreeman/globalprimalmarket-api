@@ -2,6 +2,7 @@ const Transaction = require("../models/transactions");
 const User = require("../models/user");
 const { uploadImages } = require("../middlewares/cloudinary");
 const Email = require("../middlewares/email");
+const Bot = require("../models/bot");
 
 exports.createDeposit = async (req, res) => {
   try {
@@ -195,6 +196,52 @@ exports.getTransaction = async (req, res) => {
     });
   } catch (error) {
     console.error("Get transaction error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
+  }
+};
+
+// GET /bots
+exports.getAllBots = async (req, res) => {
+  try {
+    const bots = await Bot.find().sort({ createdAt: -1 });
+
+    return res.status(200).json({
+      success: true,
+      count: bots.length,
+      bots,
+    });
+  } catch (error) {
+    console.error("Get bots error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
+  }
+};
+
+// GET /bots/:id
+exports.getBot = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const bot = await Bot.findById(id);
+
+    if (!bot) {
+      return res.status(404).json({
+        success: false,
+        message: "Bot not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      bot,
+    });
+  } catch (error) {
+    console.error("Get bot error:", error);
     return res.status(500).json({
       success: false,
       message: "Server error",

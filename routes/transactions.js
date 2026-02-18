@@ -1,12 +1,14 @@
 const express = require("express");
 const upload = require("../middlewares/upload");
-const { protect, authorize } = require("../middlewares/auth");
+const { protect } = require("../middlewares/auth");
 const {
   createDeposit,
   createInvestment,
   createWithdrawal,
   getMyTransactions,
   getTransaction,
+  getAllBots,
+  getBot,
 } = require("../controllers/transactions");
 const { uploadTransactionFiles } = require("../middlewares/upload");
 
@@ -18,5 +20,8 @@ router.post("/investment", protect, createInvestment);
 
 router.get("/me", protect, getMyTransactions);
 router.get("/:id", protect, getTransaction);
+
+router.get("/bots", protect, getAllBots);
+router.get("/bot/:id", protect, getBot);
 
 module.exports = router;
