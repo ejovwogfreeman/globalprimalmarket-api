@@ -1,5 +1,6 @@
 const express = require("express");
 const { protect } = require("../middlewares/auth");
+const { getAllBots, getBot } = require("../controllers/bots");
 
 const router = express.Router();
 
