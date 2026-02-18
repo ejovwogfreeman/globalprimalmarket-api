@@ -206,18 +206,16 @@ exports.getTransaction = async (req, res) => {
 // GET /bots
 exports.getAllBots = async (req, res) => {
   try {
-    const bots = await Bot.find().sort({ createdAt: -1 });
-
-    return res.status(200).json({
+    const bots = await Bot.find().sort({ createdAt: -1 }); // latest first
+    res.status(200).json({
       success: true,
-      count: bots.length,
       bots,
     });
   } catch (error) {
-    console.error("Get bots error:", error);
-    return res.status(500).json({
+    console.error(error);
+    res.status(500).json({
       success: false,
-      message: "Server error",
+      message: "Server error while fetching bots",
     });
   }
 };
@@ -236,15 +234,15 @@ exports.getBot = async (req, res) => {
       });
     }
 
-    return res.status(200).json({
+    res.status(200).json({
       success: true,
       bot,
     });
   } catch (error) {
-    console.error("Get bot error:", error);
-    return res.status(500).json({
+    console.error(error);
+    res.status(500).json({
       success: false,
-      message: "Server error",
+      message: "Server error while fetching the bot",
     });
   }
 };

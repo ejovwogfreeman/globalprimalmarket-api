@@ -199,57 +199,6 @@ const getSingleTransaction = async (req, res) => {
   }
 };
 
-/**
- * @desc Update transaction status (admin only)
- */
-// const updateTransactionStatus = async (req, res) => {
-//   try {
-//     const { status } = req.body;
-
-//     if (!["pending", "approved", "in progress", "declined"].includes(status)) {
-//       return res.status(400).json({ message: "Invalid status value" });
-//     }
-
-//     const transaction = await Transaction.findById(req.params.id);
-//     if (!transaction)
-//       return res.status(404).json({ message: "Transaction not found" });
-
-//     const user = await User.findById(transaction.user);
-//     if (!user) return res.status(404).json({ message: "User not found" });
-
-//     // Apply balance changes
-//     if (transaction.status === "pending" && status === "approved") {
-//       if (transaction.type === "deposit") user.balance += transaction.amount;
-//       if (["withdrawal", "investment"].includes(transaction.type)) {
-//         if (user.balance < transaction.amount)
-//           return res.status(400).json({ message: "Insufficient balance" });
-//         user.balance -= transaction.amount;
-//       }
-//     }
-
-//     // Rollback
-//     if (transaction.status === "approved" && status === "pending") {
-//       if (transaction.type === "deposit") user.balance -= transaction.amount;
-//       if (["withdrawal", "investment"].includes(transaction.type))
-//         user.balance += transaction.amount;
-//     }
-
-//     transaction.status = status;
-
-//     await user.save();
-//     await transaction.save();
-
-//     res.json({
-//       success: true,
-//       message: "Transaction status updated successfully",
-//       transaction,
-//     });
-//   } catch (err) {
-//     console.error("UpdateTransactionStatus error:", err);
-//     res.status(500).json({ message: "Server error" });
-//   }
-// };
-
 const updateTransactionStatus = async (req, res) => {
   try {
     const { status } = req.body;
