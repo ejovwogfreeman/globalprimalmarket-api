@@ -1,5 +1,6 @@
-// const Transaction = require("../models/transactions");
 const Bot = require("../models/bot");
+const Transaction = require("../models/transactions");
+const { uploadImages } = require("../middlewares/cloudinary");
 
 // GET /bots
 exports.getAllBots = async (req, res) => {
@@ -41,6 +42,64 @@ exports.getBot = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Server error while fetching the bot",
+    });
+  }
+};
+
+exports.purchaseBot = async (req, res) => {
+  try {
+    const { mode, amount } = req.body; // frontend sends amount and mode
+    const user = req.user;
+
+    // ---- VALIDATION ----
+    if (!amount || Number(amount) <= 0) {
+      return res.status(400).json({ message: "Invalid amount" });
+    }
+
+    if (!req.files?.proof || req.files.proof.length === 0) {
+      return res
+        .status(400)
+        .json({ message: "Purchase proof image is required" });
+    }
+
+    // ---- FILE UPLOAD ----
+    const proofImages = req.files.proof;
+    let uploadedProofs = [];
+
+    if (proofImages.length > 0) {
+      uploadedProofs = await uploadImages(proofImages, "purchases/proofs");
+    }
+
+    // ---- TRANSACTION DATA ----
+    const transactionData = {
+      user: user._id,
+      type: "bot purchase",
+      amount, // amount sent from frontend
+      mode, // crypto symbol like BTC, ETH, etc.
+      proof: uploadedProofs, // array of uploaded images
+      status: "pending", // admin approval
+    };
+
+    const transaction = await Transaction.create(transactionData);
+
+    // Optional: send email confirmation
+    await Email(user.email, "Bot Purchase Submitted", "bot-purchase.html", {
+      EMAIL: user.email,
+      AMOUNT: amount,
+      MODE: mode,
+    });
+
+    return res.status(201).json({
+      success: true,
+      message: "Bot purchase request submitted successfully",
+      transaction,
+    });
+  } catch (error) {
+    console.error("Purchase bot error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error submitting bot purchase",
+      error,
     });
   }
 };
