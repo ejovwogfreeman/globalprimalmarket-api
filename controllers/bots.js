@@ -207,10 +207,7 @@ exports.purchaseBot = async (req, res) => {
     await Email(user.email, "Bot Purchase Submitted", "botpurchase.html", {
       EMAIL: user.email,
       AMOUNT: amount,
-      MODE: mode,
-      DAILY_RETURN: dailyReturnPercent,
-      DURATION: durationDays,
-      MAX_RETURN: maxReturnPercent,
+      CURRENCY: mode,
     });
 
     return res.status(201).json({
