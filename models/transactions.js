@@ -42,17 +42,14 @@ const transactionSchema = new mongoose.Schema(
     },
     dailyReturnPercent: {
       type: Number,
-      required: true,
       min: 0,
     },
     durationDays: {
       type: Number,
-      required: true,
       min: 1,
     },
     maxReturnPercent: {
       type: Number,
-      required: true,
       min: 0,
     },
   },
