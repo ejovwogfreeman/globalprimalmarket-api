@@ -47,9 +47,95 @@ exports.getBot = async (req, res) => {
   }
 };
 
+// exports.purchaseBot = async (req, res) => {
+//   try {
+//     const { mode, amount } = req.body;
+//     const user = req.user;
+
+//     // ---- VALIDATION ----
+//     if (!amount || Number(amount) <= 0) {
+//       return res.status(400).json({ message: "Invalid amount" });
+//     }
+
+//     if (!mode) {
+//       return res.status(400).json({ message: "Payment mode is required" });
+//     }
+
+//     if (!req.files?.images || req.files.images.length === 0) {
+//       return res
+//         .status(400)
+//         .json({ message: "Purchase proof image is required" });
+//     }
+
+//     // ---- CHECK USER BALANCE ----
+//     const userBalance = user.balance?.[mode];
+
+//     if (userBalance === undefined) {
+//       return res.status(400).json({
+//         message: `Invalid payment mode selected`,
+//       });
+//     }
+
+//     if (Number(userBalance) < Number(amount)) {
+//       return res.status(400).json({
+//         message: `Insufficient ${mode} balance`,
+//       });
+//     }
+
+//     const images = req.files.images;
+//     let uploadedProofs = [];
+
+//     if (images.length > 0) {
+//       uploadedProofs = await uploadImages(images, "purchase/proofs");
+//     }
+
+//     // ---- CREATE TRANSACTION ----
+//     const transactionData = {
+//       user: user._id,
+//       type: "bot purchase",
+//       amount,
+//       mode,
+//       proof: uploadedProofs,
+//       status: "pending",
+//     };
+
+//     const transaction = await Transaction.create(transactionData);
+
+//     // ---- OPTIONAL: DEDUCT BALANCE (if you want immediate deduction) ----
+//     // user.balance[mode] -= Number(amount);
+//     // await user.save();
+
+//     // ---- EMAIL ----
+//     await Email(user.email, "Bot Purchase Submitted", "botpurchase.html", {
+//       EMAIL: user.email,
+//       AMOUNT: amount,
+//       MODE: mode,
+//     });
+
+//     return res.status(201).json({
+//       success: true,
+//       message: "Bot purchase request submitted successfully",
+//       transaction,
+//     });
+//   } catch (error) {
+//     console.error("Purchase bot error:", error);
+//     return res.status(500).json({
+//       success: false,
+//       message: "Error submitting bot purchase",
+//     });
+//   }
+// };
+
 exports.purchaseBot = async (req, res) => {
   try {
-    const { mode, amount } = req.body;
+    const {
+      mode,
+      amount,
+      botName,
+      dailyReturnPercent,
+      durationDays,
+      maxReturnPercent,
+    } = req.body;
     const user = req.user;
 
     // ---- VALIDATION ----
@@ -61,6 +147,18 @@ exports.purchaseBot = async (req, res) => {
       return res.status(400).json({ message: "Payment mode is required" });
     }
 
+    if (dailyReturnPercent === undefined || dailyReturnPercent < 0) {
+      return res.status(400).json({ message: "Invalid dailyReturnPercent" });
+    }
+
+    if (!durationDays || durationDays < 1) {
+      return res.status(400).json({ message: "Invalid durationDays" });
+    }
+
+    if (maxReturnPercent === undefined || maxReturnPercent < 0) {
+      return res.status(400).json({ message: "Invalid maxReturnPercent" });
+    }
+
     if (!req.files?.images || req.files.images.length === 0) {
       return res
         .status(400)
@@ -69,7 +167,6 @@ exports.purchaseBot = async (req, res) => {
 
     // ---- CHECK USER BALANCE ----
     const userBalance = user.balance?.[mode];
-
     if (userBalance === undefined) {
       return res.status(400).json({
         message: `Invalid payment mode selected`,
@@ -82,6 +179,7 @@ exports.purchaseBot = async (req, res) => {
       });
     }
 
+    // ---- UPLOAD PROOFS ----
     const images = req.files.images;
     let uploadedProofs = [];
 
@@ -95,21 +193,24 @@ exports.purchaseBot = async (req, res) => {
       type: "bot purchase",
       amount,
       mode,
+      plan: botName,
       proof: uploadedProofs,
       status: "pending",
+      dailyReturnPercent,
+      durationDays,
+      maxReturnPercent,
     };
 
     const transaction = await Transaction.create(transactionData);
-
-    // ---- OPTIONAL: DEDUCT BALANCE (if you want immediate deduction) ----
-    // user.balance[mode] -= Number(amount);
-    // await user.save();
 
     // ---- EMAIL ----
     await Email(user.email, "Bot Purchase Submitted", "botpurchase.html", {
       EMAIL: user.email,
       AMOUNT: amount,
       MODE: mode,
+      DAILY_RETURN: dailyReturnPercent,
+      DURATION: durationDays,
+      MAX_RETURN: maxReturnPercent,
     });
 
     return res.status(201).json({

@@ -107,43 +107,105 @@ exports.createWithdrawal = async (req, res) => {
   }
 };
 
+// exports.createInvestment = async (req, res) => {
+//   try {
+//     const { amount, mode, plan } = req.body;
+
+//     if (!amount || amount <= 0) {
+//       return res.status(400).json({
+//         message: "Invalid amount",
+//       });
+//     }
+
+//     const user = await User.findById(req.user.id);
+//     if (!user || user.balance[mode] < amount) {
+//       return res.status(400).json({
+//         message: `Insufficient  ${mode} balance`,
+//       });
+//     }
+
+//     const transaction = await Transaction.create({
+//       user: req.user.id,
+//       type: "investment",
+//       amount,
+//       mode,
+//       plan,
+//       status: "in progress",
+//     });
+
+//     // Email the verification code
+//     await Email(
+//       user.email,
+//       "Investment Successful",
+//       "investment.html",
+//       { EMAIL: user.email, AMOUNT: amount, CURRENCY: mode, PLAN_NAME: plan }, // dynamic value
+//     );
+
+//     return res.status(201).json({
+//       success: true,
+//       message: "Investment reequest submitted successfully",
+//       transaction,
+//     });
+//   } catch (error) {
+//     return res.status(500).json({ message: error.message });
+//   }
+// };
+
 exports.createInvestment = async (req, res) => {
   try {
-    const { amount, mode, plan } = req.body;
+    const {
+      amount,
+      mode,
+      plan,
+      dailyReturnPercent,
+      durationDays,
+      maxReturnPercent,
+    } = req.body;
 
+    // Validate required fields
     if (!amount || amount <= 0) {
-      return res.status(400).json({
-        message: "Invalid amount",
-      });
+      return res.status(400).json({ message: "Invalid amount" });
+    }
+    if (dailyReturnPercent === undefined || dailyReturnPercent < 0) {
+      return res.status(400).json({ message: "Invalid dailyReturnPercent" });
+    }
+    if (!durationDays || durationDays < 1) {
+      return res.status(400).json({ message: "Invalid durationDays" });
+    }
+    if (maxReturnPercent === undefined || maxReturnPercent < 0) {
+      return res.status(400).json({ message: "Invalid maxReturnPercent" });
     }
 
+    // Check user and balance
     const user = await User.findById(req.user.id);
     if (!user || user.balance[mode] < amount) {
-      return res.status(400).json({
-        message: `Insufficient  ${mode} balance`,
-      });
+      return res.status(400).json({ message: `Insufficient ${mode} balance` });
     }
 
+    // Create the investment transaction
     const transaction = await Transaction.create({
       user: req.user.id,
       type: "investment",
       amount,
       mode,
       plan,
+      dailyReturnPercent,
+      durationDays,
+      maxReturnPercent,
       status: "in progress",
     });
 
-    // Email the verification code
+    // Email notification
     await Email(
       user.email,
       "Investment Successful",
       "investment.html",
-      { EMAIL: user.email, AMOUNT: amount, CURRENCY: mode, PLAN_NAME: plan }, // dynamic value
+      { EMAIL: user.email, AMOUNT: amount, CURRENCY: mode, PLAN_NAME: plan }, // dynamic values
     );
 
     return res.status(201).json({
       success: true,
-      message: "Investment reequest submitted successfully",
+      message: "Investment request submitted successfully",
       transaction,
     });
   } catch (error) {

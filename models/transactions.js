@@ -36,8 +36,24 @@ const transactionSchema = new mongoose.Schema(
       type: String,
     },
 
+    // plan should be botname for bot
     plan: {
       type: String,
+    },
+    dailyReturnPercent: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
+    durationDays: {
+      type: Number,
+      required: true,
+      min: 1,
+    },
+    maxReturnPercent: {
+      type: Number,
+      required: true,
+      min: 0,
     },
   },
   {
