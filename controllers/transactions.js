@@ -73,10 +73,28 @@ exports.createWithdrawal = async (req, res) => {
       });
     }
 
-    const user = await User.findById(req.user.id);
-    if (!user || user.balance < amount) {
+    if (!mode) {
       return res.status(400).json({
-        message: "Insufficient balance",
+        message: "Withdrawal mode is required",
+      });
+    }
+
+    const user = await User.findById(req.user.id);
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    // Ensure balance object exists and mode exists inside it
+    if (
+      !user.balance ||
+      !user.balance[mode] ||
+      Number(user.balance[mode]) < Number(amount)
+    ) {
+      return res.status(400).json({
+        message: `Insufficient ${mode} balance`,
       });
     }
 
@@ -89,13 +107,12 @@ exports.createWithdrawal = async (req, res) => {
       status: "pending",
     });
 
-    // Email the verification code
-    await Email(
-      user.email,
-      "Withdraw Successful",
-      "withdraw.html",
-      { EMAIL: user.email, AMOUNT: amount, CURRENCY: mode }, // dynamic value
-    );
+    // Email notification
+    await Email(user.email, "Withdraw Successful", "withdraw.html", {
+      EMAIL: user.email,
+      AMOUNT: amount,
+      CURRENCY: mode,
+    });
 
     return res.status(201).json({
       success: true,
@@ -106,50 +123,6 @@ exports.createWithdrawal = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
-
-// exports.createInvestment = async (req, res) => {
-//   try {
-//     const { amount, mode, plan } = req.body;
-
-//     if (!amount || amount <= 0) {
-//       return res.status(400).json({
-//         message: "Invalid amount",
-//       });
-//     }
-
-//     const user = await User.findById(req.user.id);
-//     if (!user || user.balance[mode] < amount) {
-//       return res.status(400).json({
-//         message: `Insufficient  ${mode} balance`,
-//       });
-//     }
-
-//     const transaction = await Transaction.create({
-//       user: req.user.id,
-//       type: "investment",
-//       amount,
-//       mode,
-//       plan,
-//       status: "in progress",
-//     });
-
-//     // Email the verification code
-//     await Email(
-//       user.email,
-//       "Investment Successful",
-//       "investment.html",
-//       { EMAIL: user.email, AMOUNT: amount, CURRENCY: mode, PLAN_NAME: plan }, // dynamic value
-//     );
-
-//     return res.status(201).json({
-//       success: true,
-//       message: "Investment reequest submitted successfully",
-//       transaction,
-//     });
-//   } catch (error) {
-//     return res.status(500).json({ message: error.message });
-//   }
-// };
 
 exports.createInvestment = async (req, res) => {
   try {
