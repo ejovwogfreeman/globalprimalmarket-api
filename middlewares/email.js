@@ -74,7 +74,7 @@ const email = async (receiver, subject, body, replacements = {}) => {
     }
 
     const info = await transporter.sendMail({
-      from: `"Global Primal Market Trading" <${process.env.GMAIL_USER}>`,
+      from: `"Global Primal Wallet" <${process.env.GMAIL_USER}>`,
       to: receiver,
       subject,
       html,
