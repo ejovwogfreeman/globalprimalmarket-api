@@ -236,3 +236,67 @@ exports.getTransaction = async (req, res) => {
     });
   }
 };
+
+exports.claimBonus = async (req, res) => {
+  try {
+    const { transactionId } = req.params;
+
+    const transaction = await Transaction.findById(transactionId);
+    if (!transaction)
+      return res
+        .status(404)
+        .json({ success: false, message: "Transaction not found" });
+
+    // Only for investment or bot purchase
+    if (!["investment", "bot purchase"].includes(transaction.type))
+      return res
+        .status(400)
+        .json({
+          success: false,
+          message: "Cannot claim bonus for this transaction type",
+        });
+
+    // Check if already claimed
+    if (transaction.claimed)
+      return res
+        .status(400)
+        .json({ success: false, message: "Bonus already claimed" });
+
+    // Check if durationDays passed
+    const now = new Date();
+    const endDate = new Date(transaction.createdAt);
+    endDate.setDate(endDate.getDate() + transaction.durationDays);
+
+    if (now < endDate)
+      return res
+        .status(400)
+        .json({ success: false, message: "Investment period not yet over" });
+
+    // Calculate bonus: either based on dailyReturnPercent * durationDays or maxReturnPercent
+    const bonus = Math.min(
+      (transaction.amount *
+        transaction.dailyReturnPercent *
+        transaction.durationDays) /
+        100,
+      transaction.amount * (transaction.maxReturnPercent / 100),
+    );
+
+    // Update user balance
+    const user = await User.findById(transaction.user);
+    user.balance = (user.balance || 0) + bonus; // adjust depending on your balance structure
+    await user.save();
+
+    // Mark transaction as claimed
+    transaction.claimed = true;
+    await transaction.save();
+
+    return res.json({
+      success: true,
+      message: "Bonus claimed successfully",
+      bonus,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+};

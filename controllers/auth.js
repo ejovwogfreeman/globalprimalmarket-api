@@ -48,7 +48,7 @@ register = async (req, res) => {
         });
       } else {
         // User exists and already verified
-        return res.status(200).json({
+        return res.status(400).json({
           message: "Email already exists and is verified. Please login.",
           user: {
             email: exists.email,

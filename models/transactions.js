@@ -26,6 +26,11 @@ const transactionSchema = new mongoose.Schema(
       default: "pending",
     },
 
+    claimed: {
+      type: Boolean,
+      default: false, // tracks if bonus has been claimed
+    },
+
     proof: [{ type: String, required: true }],
 
     address: {

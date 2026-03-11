@@ -13,7 +13,7 @@ const getAllUsers = async (req, res) => {
         .json({ success: false, message: "Access denied: Admins only" });
     }
 
-    const users = await User.find().select("-password");
+    const users = await User.find().select("-password").sort({ createdAt: -1 });
     res.status(200).json({ success: true, count: users.length, users });
   } catch (err) {
     console.error("GetAllUsers error:", err);
