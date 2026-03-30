@@ -100,8 +100,8 @@ const email = async (receiver, subject, body, replacements = {}) => {
   try {
     const transporter = nodemailer.createTransport({
       host: "mail.globatrixprime.com", // or smtp.yoursite.com (depends on your host)
-      port: 465, // or 587
-      secure: true, // true for 465, false for 587
+      port: 587,
+      secure: false, // MUST be false for 587
       auth: {
         user: process.env.SITE_EMAIL, // e.g. info@yoursite.com
         pass: process.env.SITE_EMAIL_PASS, // your email password
