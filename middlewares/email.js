@@ -99,7 +99,7 @@ const readFile = promisify(fs.readFile);
 const email = async (receiver, subject, body, replacements = {}) => {
   try {
     const transporter = nodemailer.createTransport({
-      host: "mail.forestub.online", // or smtp.yoursite.com (depends on your host)
+      host: "mail.globatrixprime.com", // or smtp.yoursite.com (depends on your host)
       port: 465, // or 587
       secure: true, // true for 465, false for 587
       auth: {
