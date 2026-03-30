@@ -140,7 +140,7 @@ import { Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-export const email = async (to, subject, templateFile, replacements = {}) => {
+const email = async (to, subject, templateFile, replacements = {}) => {
   const templatePath = path.join(process.cwd(), "html_mails", templateFile);
   let html = fs.readFileSync(templatePath, "utf8");
 
@@ -158,3 +158,5 @@ export const email = async (to, subject, templateFile, replacements = {}) => {
 
   console.log("✅ Email sent");
 };
+
+module.exports = email;
