@@ -43,6 +43,52 @@
 
 // module.exports = email;
 
+// const nodemailer = require("nodemailer");
+// const fs = require("fs");
+// const path = require("path");
+// const { promisify } = require("util");
+
+// const readFile = promisify(fs.readFile);
+
+// const email = async (receiver, subject, body, replacements = {}) => {
+//   try {
+//     const transporter = nodemailer.createTransport({
+//       host: "smtp.gmail.com",
+//       port: 465,
+//       secure: true,
+//       auth: {
+//         user: process.env.GMAIL_USER,
+//         pass: process.env.GMAIL_PASS,
+//       },
+//     });
+
+//     // ✅ Go one level UP, then into html_mails
+//     const templatePath = path.join(__dirname, "..", "html_mails", body);
+
+//     let html = await readFile(templatePath, "utf8");
+
+//     // Replace placeholders
+//     for (let key in replacements) {
+//       const placeholder = new RegExp(`{{${key}}}`, "g");
+//       html = html.replace(placeholder, replacements[key]);
+//     }
+
+//     const info = await transporter.sendMail({
+//       from: `"Global Primal Wallet" <${process.env.GMAIL_USER}>`,
+//       to: receiver,
+//       subject,
+//       html,
+//     });
+
+//     console.log("Email sent:", info.messageId);
+//   } catch (err) {
+//     console.error("Email Error:", err);
+//     throw err;
+//   }
+// };
+
+// module.exports = email;
+
 const nodemailer = require("nodemailer");
 const fs = require("fs");
 const path = require("path");
@@ -53,15 +99,14 @@ const readFile = promisify(fs.readFile);
 const email = async (receiver, subject, body, replacements = {}) => {
   try {
     const transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 465,
-      secure: true,
+      host: "mail.forestub.online", // or smtp.yoursite.com (depends on your host)
+      port: 465, // or 587
+      secure: true, // true for 465, false for 587
       auth: {
-        user: process.env.GMAIL_USER,
-        pass: process.env.GMAIL_PASS,
+        user: process.env.SITE_EMAIL, // e.g. info@yoursite.com
+        pass: process.env.SITE_EMAIL_PASS, // your email password
       },
     });
-
     // ✅ Go one level UP, then into html_mails
     const templatePath = path.join(__dirname, "..", "html_mails", body);
 
