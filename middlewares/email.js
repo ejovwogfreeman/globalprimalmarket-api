@@ -154,6 +154,7 @@ const email = async (to, subject, templateFile, replacements = {}) => {
     to,
     subject,
     html,
+    reply_to: process.env.SITE_EMAIL_REPLY,
   });
 
   console.log("✅ Email sent");
