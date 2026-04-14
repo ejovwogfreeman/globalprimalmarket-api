@@ -249,12 +249,10 @@ exports.claimBonus = async (req, res) => {
 
     // Only for investment or bot purchase
     if (!["investment", "bot purchase"].includes(transaction.type))
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "Cannot claim bonus for this transaction type",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "Cannot claim bonus for this transaction type",
+      });
 
     // Check if already claimed
     if (transaction.claimed)
