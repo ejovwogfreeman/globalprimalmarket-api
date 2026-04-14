@@ -237,40 +237,109 @@ exports.getTransaction = async (req, res) => {
   }
 };
 
+// exports.claimBonus = async (req, res) => {
+//   try {
+//     const { transactionId } = req.params;
+
+//     const transaction = await Transaction.findById(transactionId);
+//     if (!transaction)
+//       return res
+//         .status(404)
+//         .json({ success: false, message: "Transaction not found" });
+
+//     // Only for investment or bot purchase
+//     if (!["investment", "bot purchase"].includes(transaction.type))
+//       return res.status(400).json({
+//         success: false,
+//         message: "Cannot claim bonus for this transaction type",
+//       });
+
+//     // Check if already claimed
+//     if (transaction.claimed)
+//       return res
+//         .status(400)
+//         .json({ success: false, message: "Bonus already claimed" });
+
+//     // Check if durationDays passed
+//     const now = new Date();
+//     const endDate = new Date(transaction.createdAt);
+//     endDate.setDate(endDate.getDate() + transaction.durationDays);
+
+//     if (now < endDate)
+//       return res
+//         .status(400)
+//         .json({ success: false, message: "Investment period not yet over" });
+
+//     // Calculate bonus: either based on dailyReturnPercent * durationDays or maxReturnPercent
+//     const bonus = Math.min(
+//       (transaction.amount *
+//         transaction.dailyReturnPercent *
+//         transaction.durationDays) /
+//         100,
+//       transaction.amount * (transaction.maxReturnPercent / 100),
+//     );
+
+//     // Update user balance
+//     const user = await User.findById(transaction.user);
+//     user.balance = (user.balance || 0) + bonus; // adjust depending on your balance structure
+//     await user.save();
+
+//     // Mark transaction as claimed
+//     transaction.claimed = true;
+//     await transaction.save();
+
+//     return res.json({
+//       success: true,
+//       message: "Bonus claimed successfully",
+//       bonus,
+//     });
+//   } catch (err) {
+//     console.error(err);
+//     return res.status(500).json({ success: false, message: "Server error" });
+//   }
+// };
+
 exports.claimBonus = async (req, res) => {
   try {
     const { transactionId } = req.params;
 
     const transaction = await Transaction.findById(transactionId);
-    if (!transaction)
-      return res
-        .status(404)
-        .json({ success: false, message: "Transaction not found" });
+    if (!transaction) {
+      return res.status(404).json({
+        success: false,
+        message: "Transaction not found",
+      });
+    }
 
     // Only for investment or bot purchase
-    if (!["investment", "bot purchase"].includes(transaction.type))
+    if (!["investment", "bot purchase"].includes(transaction.type)) {
       return res.status(400).json({
         success: false,
         message: "Cannot claim bonus for this transaction type",
       });
+    }
 
-    // Check if already claimed
-    if (transaction.claimed)
-      return res
-        .status(400)
-        .json({ success: false, message: "Bonus already claimed" });
+    // Already claimed
+    if (transaction.claimed) {
+      return res.status(400).json({
+        success: false,
+        message: "Bonus already claimed",
+      });
+    }
 
-    // Check if durationDays passed
+    // Check duration
     const now = new Date();
     const endDate = new Date(transaction.createdAt);
     endDate.setDate(endDate.getDate() + transaction.durationDays);
 
-    if (now < endDate)
-      return res
-        .status(400)
-        .json({ success: false, message: "Investment period not yet over" });
+    if (now < endDate) {
+      return res.status(400).json({
+        success: false,
+        message: "Investment period not yet over",
+      });
+    }
 
-    // Calculate bonus: either based on dailyReturnPercent * durationDays or maxReturnPercent
+    // ---- CALCULATE BONUS ----
     const bonus = Math.min(
       (transaction.amount *
         transaction.dailyReturnPercent *
@@ -279,12 +348,30 @@ exports.claimBonus = async (req, res) => {
       transaction.amount * (transaction.maxReturnPercent / 100),
     );
 
-    // Update user balance
+    // ---- UPDATE USER BALANCE BASED ON MODE ----
     const user = await User.findById(transaction.user);
-    user.balance = (user.balance || 0) + bonus; // adjust depending on your balance structure
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    const mode = transaction.mode;
+
+    // Ensure balance structure exists
+    if (!user.balance) user.balance = {};
+
+    if (!user.balance[mode]) {
+      user.balance[mode] = 0; // or { amount: 0, usdtequiv: 0 } if you're using object structure
+    }
+
+    user.balance[mode] = Number(user.balance[mode]) + Number(bonus);
+
     await user.save();
 
-    // Mark transaction as claimed
+    // ---- MARK AS CLAIMED ----
     transaction.claimed = true;
     await transaction.save();
 
@@ -292,9 +379,13 @@ exports.claimBonus = async (req, res) => {
       success: true,
       message: "Bonus claimed successfully",
       bonus,
+      mode,
     });
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ success: false, message: "Server error" });
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
   }
 };
