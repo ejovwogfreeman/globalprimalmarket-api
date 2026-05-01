@@ -10,6 +10,7 @@ const {
   getMe,
   updateProfile,
   changeProfilePicture,
+  deleteAccount,
 } = require("../controllers/user");
 
 // Multer setup for single file upload (profile picture)
@@ -33,5 +34,7 @@ router.post(
   uploadProfilePicture,
   changeProfilePicture,
 );
+
+router.post("/delete-account", protect, updateProfile);
 
 module.exports = router;
