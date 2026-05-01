@@ -174,6 +174,7 @@ deleteAccount = async (req, res) => {
     return res.status(200).json({
       status: true,
       message: "Account deleted successfully",
+      success: true,
     });
   } catch (error) {
     console.log(error);
