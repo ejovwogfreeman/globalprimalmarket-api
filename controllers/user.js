@@ -156,7 +156,7 @@ deleteAccount = async (req, res) => {
     }
 
     // Compare password
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await user.comparePassword(password);
     if (!isMatch) {
       return res.status(400).json({
         status: false,
@@ -176,6 +176,7 @@ deleteAccount = async (req, res) => {
       message: "Account deleted successfully",
     });
   } catch (error) {
+    console.log(error);
     return res.status(500).json({
       status: false,
       message: "Something went wrong",
