@@ -35,6 +35,6 @@ router.post(
   changeProfilePicture,
 );
 
-router.post("/delete-account", protect, updateProfile);
+router.post("/delete-account", protect, deleteAccount);
 
 module.exports = router;
